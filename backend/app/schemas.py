@@ -79,6 +79,10 @@ class BatchScanRequest(BaseModel):
     source_folder: str
 
 
+class ImageDeleteRequest(BaseModel):
+    image_ids: list[int] = Field(min_length=1)
+
+
 class GenerationRecord(BaseModel):
     id: int
     prompt: str

@@ -31,7 +31,7 @@ def _image_summary(db: Session, image: Image) -> ImageSummary:
         created_at=image.created_at,
         description_count=description_count,
         question_count=question_count,
-        preview_url=f"/api/images/{image.id}/file",
+        preview_url=f"/api/images/{image.id}/file?v={image.sha256[:12]}",
     )
 
 
@@ -159,7 +159,13 @@ def get_image_file(image_id: int, db: Session = Depends(get_db)):
     file_path = resolve_image_path(image.stored_path)
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="图片文件不存在。")
-    return FileResponse(file_path)
+    return FileResponse(
+        file_path,
+        headers={
+            "Cache-Control": "no-store, max-age=0",
+            "Pragma": "no-cache",
+        },
+    )
 
 
 @router.patch("/descriptions/{record_id}", response_model=GenerationRecord)

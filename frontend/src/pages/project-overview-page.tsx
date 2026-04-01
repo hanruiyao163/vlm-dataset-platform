@@ -168,8 +168,12 @@ export function ProjectOverviewPage({ projectId }: { projectId: number }) {
             <Textarea value={questionPrompt} onChange={(event) => setQuestionPrompt(event.target.value)} />
           </div>
           <div className="flex justify-end">
-            <Button onClick={() => savePromptMutation.mutate()} disabled={savePromptMutation.isPending}>
-              {savePromptMutation.isPending ? "保存中..." : "保存项目提示词"}
+            <Button
+              className="min-w-[10rem]"
+              onClick={() => savePromptMutation.mutate()}
+              disabled={savePromptMutation.isPending}
+            >
+              保存项目提示词
             </Button>
           </div>
         </CardContent>
@@ -214,10 +218,11 @@ export function ProjectOverviewPage({ projectId }: { projectId: number }) {
                 取消
               </Button>
               <Button
+                className="min-w-[10rem]"
                 onClick={() => editingBatchId !== null && updateBatchMutation.mutate(editingBatchId)}
                 disabled={updateBatchMutation.isPending}
               >
-                {updateBatchMutation.isPending ? "保存中..." : "保存批次提示词"}
+                保存批次提示词
               </Button>
             </div>
           </div>

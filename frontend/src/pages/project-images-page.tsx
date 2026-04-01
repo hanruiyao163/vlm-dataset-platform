@@ -33,6 +33,7 @@ export function ProjectImagesPage({
   const [descriptionOpen, setDescriptionOpen] = useState(false);
   const [questionOpen, setQuestionOpen] = useState(false);
   const [promptEditorOpen, setPromptEditorOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [descriptionPrompt, setDescriptionPrompt] = useState("");
   const [questionPrompt, setQuestionPrompt] = useState("");
 
@@ -108,6 +109,22 @@ export function ProjectImagesPage({
       push("批次提示词已保存");
     },
     onError: (error: Error) => push("保存失败", error.message),
+  });
+  const deleteImagesMutation = useMutation({
+    mutationFn: () => api.deleteProjectImages(projectId, selectedIds),
+    onSuccess: () => {
+      setDeleteDialogOpen(false);
+      setPreviewImageId((current) => (current && selectedIds.includes(current) ? null : current));
+      setSelectedIds([]);
+      queryClient.invalidateQueries({ queryKey: ["images", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["image-ids", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["batches", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["logs"] });
+      push("图片索引已删除", "仅删除平台中的图片、描述和问题记录，不会删除硬盘原图。");
+    },
+    onError: (error: Error) => push("删除失败", error.message),
   });
 
   useEffect(() => {
@@ -233,6 +250,9 @@ export function ProjectImagesPage({
               <Button size="sm" onClick={() => setQuestionOpen(true)} disabled={selectedIds.length === 0}>
                 生成问题
               </Button>
+              <Button variant="outline" size="sm" onClick={() => setDeleteDialogOpen(true)} disabled={selectedIds.length === 0}>
+                删除选中
+              </Button>
             </>
           }
         />
@@ -357,6 +377,24 @@ export function ProjectImagesPage({
                 {isSavingPrompt ? "保存中..." : "保存提示词"}
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>删除选中图片</DialogTitle>
+            <DialogDescription>
+              会删除当前选中的 {selectedIds.length} 张图片索引，以及它们关联的描述、问题和日志记录，但不会删除硬盘中的原始图片文件。
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              取消
+            </Button>
+            <Button onClick={() => deleteImagesMutation.mutate()} disabled={deleteImagesMutation.isPending}>
+              确认删除
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

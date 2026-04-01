@@ -23,7 +23,7 @@ export function AppShell() {
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.28em] text-white/50">Dataset Workbench</p>
-                <h1 className="font-semibold text-white">违规行为图像平台</h1>
+                <h1 className="font-semibold text-white">VLM图像数据集平台</h1>
               </div>
             </div>
             <div className="rounded-2xl bg-white/[0.06] p-4">
@@ -32,7 +32,7 @@ export function AppShell() {
                 生产流程
               </div>
               <p className="text-sm leading-6 text-white/65">
-                从项目创建、批量导图、描述与问题生成，到最终 ShareGPT 导出，全部在一个工作台里完成。
+                从项目创建、批量导图、描述与问题生成，到最终 数据集 导出，全部在一个工作台里完成。
               </p>
             </div>
           </div>
@@ -73,7 +73,7 @@ export function AppShell() {
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Workbench</p>
-                <h1 className="text-sm font-semibold">违规行为图像平台</h1>
+                <h1 className="text-sm font-semibold">VLM图像数据集平台</h1>
               </div>
             </div>
           </div>

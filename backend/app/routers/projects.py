@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from ..db import get_db
 from ..models import Batch, DescriptionGeneration, Image, Project, QuestionGeneration
-from ..schemas import BatchSummary, ProjectCreate, ProjectSummary, ProjectUpdate
+from ..schemas import BatchSummary, ImageDeleteRequest, MessageResponse, ProjectCreate, ProjectSummary, ProjectUpdate
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
@@ -117,3 +117,27 @@ def list_project_batches(project_id: int, db: Session = Depends(get_db)):
             )
         )
     return items
+
+
+@router.delete("/{project_id}/images", response_model=MessageResponse)
+def delete_project_images(project_id: int, payload: ImageDeleteRequest, db: Session = Depends(get_db)):
+    project = db.get(Project, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="项目不存在。")
+
+    images = db.scalars(
+        select(Image).where(Image.project_id == project_id, Image.id.in_(payload.image_ids))
+    ).all()
+    if not images:
+        raise HTTPException(status_code=404, detail="未找到任何可删除图片。")
+
+    found_ids = {image.id for image in images}
+    missing_ids = [image_id for image_id in payload.image_ids if image_id not in found_ids]
+    if missing_ids:
+        raise HTTPException(status_code=400, detail=f"以下图片不属于当前项目：{', '.join(map(str, missing_ids))}")
+
+    deleted_count = len(images)
+    for image in images:
+        db.delete(image)
+    db.commit()
+    return MessageResponse(message=f"已删除 {deleted_count} 张图片索引。")

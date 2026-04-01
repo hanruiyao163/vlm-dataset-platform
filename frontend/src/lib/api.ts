@@ -54,6 +54,12 @@ export const api = {
     request<MessageResponse>(`/api/projects/${projectId}`, {
       method: "DELETE",
     }),
+  deleteProjectImages: (projectId: number, imageIds: number[]) =>
+    request<MessageResponse>(`/api/projects/${projectId}/images`, {
+      method: "DELETE",
+      headers,
+      body: JSON.stringify({ image_ids: imageIds }),
+    }),
   listBatches: (projectId: number) => request<Batch[]>(`/api/projects/${projectId}/batches`),
   updateBatch: (
     projectId: number,
