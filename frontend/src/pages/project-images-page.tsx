@@ -256,9 +256,9 @@ export function ProjectImagesPage({
             </>
           }
         />
-        <Card className="border-border/50 bg-white/88 shadow-soft backdrop-blur">
-          <CardContent className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-5">
-            <div className="space-y-2">
+        <div className="rounded-4xl border border-border/50 bg-white/88 shadow-soft backdrop-blur">
+          <div className="grid gap-2 px-4 py-2.5 md:grid-cols-2 xl:grid-cols-5 pt-5">
+            <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">批次筛选</Label>
               <Select value={search.batchId ?? "all"} onValueChange={(value) => setSearchParam({ batchId: value === "all" ? undefined : value, offset: 0 })}>
                 <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
@@ -268,7 +268,7 @@ export function ProjectImagesPage({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">描述状态</Label>
               <Select value={search.hasDescriptions ?? "all"} onValueChange={(value) => setSearchParam({ hasDescriptions: value === "all" ? undefined : value, offset: 0 })}>
                 <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
@@ -279,7 +279,7 @@ export function ProjectImagesPage({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">问题状态</Label>
               <Select value={search.hasQuestions ?? "all"} onValueChange={(value) => setSearchParam({ hasQuestions: value === "all" ? undefined : value, offset: 0 })}>
                 <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
@@ -290,11 +290,11 @@ export function ProjectImagesPage({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">当前选择</Label>
-              <Input className="h-10" value={`${selectedIds.length} 张图片已选中`} readOnly />
+              <Input className="h-8" value={`${selectedIds.length} 张图片已选中`} readOnly />
             </div>
-            <div className="space-y-2 md:col-span-2 xl:col-span-1">
+            <div className="space-y-1.5 md:col-span-2 xl:col-span-1">
               <Label className="text-xs text-muted-foreground">模型选择</Label>
               <Select value={resolvedSelectedModelProfile || undefined} onValueChange={setSelectedModelProfile}>
                 <SelectTrigger className="h-10">
@@ -312,8 +312,8 @@ export function ProjectImagesPage({
                 <p className="truncate text-xs text-muted-foreground pl-3">{activeModelProfile.model}</p>
               ) : null}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
       {imagesQuery.isLoading ? <p>加载图片中...</p> : null}
       <ImageGrid
@@ -321,6 +321,7 @@ export function ProjectImagesPage({
         selectedIds={selectedIds}
         onToggle={(imageId, checked) => setSelectedIds((current) => checked ? Array.from(new Set([...current, imageId])) : current.filter((item) => item !== imageId))}
         onOpen={(imageId) => setPreviewImageId(imageId)}
+        batches={batchesQuery.data}
       />
       <div className="mt-6 rounded-2xl border border-border/60 bg-white/85 p-4 text-center shadow-soft">
         <p className="text-sm text-muted-foreground">已加载 {imageItems.length} / {totalImages} 张图片</p>

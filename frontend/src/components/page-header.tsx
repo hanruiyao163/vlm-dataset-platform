@@ -28,8 +28,8 @@ export function PageHeader({
           <p className={`max-w-2xl text-sm text-muted-foreground ${compact ? "mt-2 leading-5" : "mt-3 leading-6"}`}>{description}</p>
         </div>
         {actions ? (
-          <div className={`rounded-[22px] border border-border/40 bg-white/72 shadow-sm backdrop-blur ${compact ? "p-1" : "p-1.5"}`}>
-            <div className={`flex flex-wrap items-center ${compact ? "gap-2" : "gap-3"}`}>{actions}</div>
+          <div className={`flex flex-wrap items-center ${compact ? "gap-2" : "gap-3"} [&_[data-slot=button]]:h-10 [&_[data-slot=button]]:px-4 [&_[data-slot=button]]:text-[13px]`}>
+            {actions}
           </div>
         ) : null}
       </div>

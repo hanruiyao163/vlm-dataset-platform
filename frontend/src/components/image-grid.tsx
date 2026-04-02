@@ -1,6 +1,6 @@
 import { ImageOff } from "lucide-react";
 
-import type { ImageItem } from "@/lib/types";
+import type { ImageItem, Batch } from "@/lib/types";
 import { formatChinaDate } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -9,11 +9,13 @@ export function ImageGrid({
   selectedIds,
   onToggle,
   onOpen,
+  batches,
 }: {
   items: ImageItem[];
   selectedIds: number[];
   onToggle: (imageId: number, checked: boolean) => void;
   onOpen: (imageId: number) => void;
+  batches?: Batch[];
 }) {
   if (items.length === 0) {
     return (
@@ -42,7 +44,14 @@ export function ImageGrid({
                 <button className="line-clamp-1 font-medium transition-colors hover:text-primary group-hover:text-primary/80" onClick={() => onOpen(item.id)}>
                   {item.filename}
                 </button>
-                <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{item.relative_path}</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <p className="line-clamp-1 flex-1 text-xs text-muted-foreground">{item.relative_path}</p>
+                  {batches && (
+                    <span className="shrink-0 rounded-md bg-primary/5 px-1.5 py-0.5 text-[10px] font-medium text-primary/70 ring-1 ring-primary/10">
+                      {batches.find(b => b.id === item.batch_id)?.name || '未知批次'}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>{item.width} × {item.height}</span>
