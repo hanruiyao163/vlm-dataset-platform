@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { PromptEditorFields } from "@/components/prompt-editor-fields";
 import { useToast } from "@/hooks/use-toast";
 
 export function ProjectImagesPage({
@@ -361,14 +361,12 @@ export function ProjectImagesPage({
             <DialogDescription>{promptDialogDescription}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>默认描述提示词</Label>
-              <Textarea value={descriptionPrompt} onChange={(event) => setDescriptionPrompt(event.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>默认问题提示词</Label>
-              <Textarea value={questionPrompt} onChange={(event) => setQuestionPrompt(event.target.value)} />
-            </div>
+            <PromptEditorFields
+              descriptionPrompt={descriptionPrompt}
+              onDescriptionPromptChange={setDescriptionPrompt}
+              questionPrompt={questionPrompt}
+              onQuestionPromptChange={setQuestionPrompt}
+            />
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setPromptEditorOpen(false)}>
                 取消

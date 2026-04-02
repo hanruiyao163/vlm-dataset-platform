@@ -10,8 +10,7 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { PromptEditorFields } from "@/components/prompt-editor-fields";
 
 export function ProjectOverviewPage({ projectId }: { projectId: number }) {
   const { push } = useToast();
@@ -159,14 +158,12 @@ export function ProjectOverviewPage({ projectId }: { projectId: number }) {
           <CardDescription>这些提示词只跟当前项目绑定。新项目默认留空，由你按项目场景分别填写。</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>默认描述提示词</Label>
-            <Textarea value={descriptionPrompt} onChange={(event) => setDescriptionPrompt(event.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label>默认问题提示词</Label>
-            <Textarea value={questionPrompt} onChange={(event) => setQuestionPrompt(event.target.value)} />
-          </div>
+          <PromptEditorFields
+            descriptionPrompt={descriptionPrompt}
+            onDescriptionPromptChange={setDescriptionPrompt}
+            questionPrompt={questionPrompt}
+            onQuestionPromptChange={setQuestionPrompt}
+          />
           <div className="flex justify-end">
             <Button
               className="min-w-[10rem]"
@@ -205,14 +202,12 @@ export function ProjectOverviewPage({ projectId }: { projectId: number }) {
             <DialogDescription>当前批次的默认提示词会优先于项目默认提示词，在图片工作台筛到该批次时自动带出。</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>默认描述提示词</Label>
-              <Textarea value={batchDescriptionPrompt} onChange={(event) => setBatchDescriptionPrompt(event.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>默认问题提示词</Label>
-              <Textarea value={batchQuestionPrompt} onChange={(event) => setBatchQuestionPrompt(event.target.value)} />
-            </div>
+            <PromptEditorFields
+              descriptionPrompt={batchDescriptionPrompt}
+              onDescriptionPromptChange={setBatchDescriptionPrompt}
+              questionPrompt={batchQuestionPrompt}
+              onQuestionPromptChange={setBatchQuestionPrompt}
+            />
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setEditingBatchId(null)}>
                 取消
