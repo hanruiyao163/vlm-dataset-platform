@@ -118,7 +118,7 @@ export function GenerateDescriptionsDialog({
           <DialogDescription>对当前选择的图片并发生成描述，并保留所有历史记录。</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="rounded-[20px] border border-border/70 bg-secondary/35 px-4 py-3 text-sm text-muted-foreground">
+          <div className="rounded-[20px] border border-border/50 bg-secondary/35 px-4 py-3 text-sm text-muted-foreground">
             当前使用模型：{selectedModelProfile || "未选择模型"}
           </div>
           <div className="space-y-2">
@@ -137,7 +137,7 @@ export function GenerateDescriptionsDialog({
           {mode === "question_image" ? (
             <div className="space-y-2">
               <Label>每张图片使用的问题</Label>
-              <div className="max-h-[240px] space-y-3 overflow-y-auto rounded-[20px] border border-border/70 bg-white/60 p-3">
+              <div className="max-h-[240px] space-y-3 overflow-y-auto rounded-[20px] border border-border/50 bg-white/65 p-3">
                 {(imageDetailQueries.data ?? []).map((item: ImageDetail) => {
                   const questions = availableQuestions[item.id] ?? [];
                   const selectedQuestionIds = selectedQuestionMap[item.id] ?? [];
@@ -147,7 +147,7 @@ export function GenerateDescriptionsDialog({
                         <p className="truncate text-sm font-medium">{item.filename}</p>
                         <p className="truncate text-xs text-muted-foreground">{item.relative_path}</p>
                       </div>
-                      <div className="space-y-2 rounded-xl border border-border/60 bg-white/70 p-3">
+                      <div className="space-y-2 rounded-xl border border-border/50 bg-white/75 p-3">
                         <p className="text-xs text-muted-foreground">
                           {questions.length === 0
                             ? "没有可用问题"
@@ -202,7 +202,7 @@ export function GenerateDescriptionsDialog({
               <Input type="number" min={1} max={20} value={concurrency} onChange={(event) => setConcurrency(Number(event.target.value))} />
             </div>
           </div>
-          <div className="flex items-start gap-3 rounded-[20px] border border-border/70 bg-white/60 px-4 py-3">
+          <div className="flex items-start gap-3 rounded-[20px] border border-border/50 bg-white/65 px-4 py-3">
             <Checkbox
               id="structured-description"
               checked={useStructuredOutput}

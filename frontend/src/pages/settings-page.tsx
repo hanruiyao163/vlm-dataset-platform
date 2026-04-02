@@ -100,8 +100,8 @@ export function SettingsPage() {
             >
               <div className="space-y-4">
                 {fields.map((field, index) => (
-                  <details key={field.id} className="group rounded-[24px] border border-border/70 bg-white/55">
-                    <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4">
+                  <details key={field.id} className="group/detail rounded-[24px] border border-border/60 bg-white/80 shadow-sm transition-all duration-200 hover:border-border/80 hover:shadow-soft">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-[24px] p-4 transition-colors hover:bg-secondary/30">
                       <div>
                         <p className="font-medium">
                           {watchedProfiles[index]?.name?.trim() || watchedProfiles[index]?.model?.trim() || `模型档案 ${index + 1}`}
@@ -226,7 +226,7 @@ export function SettingsPage() {
               <CardDescription>这里的参数会作为图片描述和问题生成的起始配置。</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="rounded-[22px] border border-border/70 bg-white/60 p-4">
+              <div className="rounded-[22px] border border-border/50 bg-white/85 p-4">
                 <div className="mb-2 flex items-center gap-2 text-sm font-medium">
                   <Bot className="h-4 w-4 text-primary" />
                   默认档案
@@ -234,14 +234,14 @@ export function SettingsPage() {
                 <p className="text-sm text-muted-foreground">{selectedDefaultProfile?.name || query.data?.model || "尚未配置"}</p>
                 <p className="mt-2 text-xs text-muted-foreground">可切换 {watchedProfiles.filter((profile) => profile.name.trim()).length} 个模型档案</p>
               </div>
-              <div className="rounded-[22px] border border-border/70 bg-white/60 p-4">
+              <div className="rounded-[22px] border border-border/50 bg-white/85 p-4">
                 <div className="mb-2 flex items-center gap-2 text-sm font-medium">
                   <Link2 className="h-4 w-4 text-primary" />
                   接口地址
                 </div>
                 <p className="break-all text-sm text-muted-foreground">{selectedDefaultProfile?.base_url || "尚未配置"}</p>
               </div>
-              <div className="rounded-[22px] border border-border/70 bg-white/60 p-4">
+              <div className="rounded-[22px] border border-border/50 bg-white/85 p-4">
                 <div className="mb-2 flex items-center gap-2 text-sm font-medium">
                   <Gauge className="h-4 w-4 text-primary" />
                   生成节奏

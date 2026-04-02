@@ -209,7 +209,7 @@ function RecordSection({
   }, [createDescriptionMode, createQuestionId, draft, editingId, isCreating, records]);
 
   return (
-    <section className="flex min-h-0 flex-col rounded-[28px] border border-border/70 bg-white/65 p-4">
+    <section className="flex min-h-0 flex-col rounded-[28px] border border-border/50 bg-white/70 p-4">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h4 className="font-semibold">{title}</h4>
@@ -235,7 +235,7 @@ function RecordSection({
         </div>
       </div>
       {isCreating ? (
-        <div ref={editingContainerRef} className="mb-4 space-y-3 rounded-2xl border border-border/70 bg-white/70 p-3">
+        <div ref={editingContainerRef} className="mb-4 space-y-3 rounded-2xl border border-border/50 bg-white/75 p-3">
           {recordType === "description" ? (
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
@@ -280,7 +280,7 @@ function RecordSection({
                     </Select>
                   </div>
                 ) : (
-                  <div className="rounded-xl border border-dashed border-border/70 bg-secondary/20 p-3 text-xs text-muted-foreground">
+                  <div className="rounded-xl border border-dashed border-border/50 bg-secondary/20 p-3 text-xs text-muted-foreground">
                     当前图片还没有可绑定的成功问题，先新增问题后才能创建问题配对描述。
                   </div>
                 )
@@ -300,7 +300,7 @@ function RecordSection({
         </div>
       ) : null}
       {records.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border/70 bg-white/40 p-4 text-sm text-muted-foreground">
+        <div className="rounded-2xl border border-dashed border-border/50 bg-white/45 p-4 text-sm text-muted-foreground">
           暂无记录。
         </div>
       ) : (
@@ -346,9 +346,9 @@ function RecordSection({
             const typeBadgeClassName =
               recordType === "description"
                 ? record.paired_question_id
-                  ? "border-amber-300/90 bg-amber-100 text-amber-900"
-                  : "border-slate-200 bg-slate-100 text-slate-700"
-                : "border-white/70 bg-secondary/80 text-secondary-foreground";
+                  ? "border-primary/30 bg-primary/10 text-primary"
+                  : "border-border/50 bg-secondary/80 text-secondary-foreground"
+                : "border-border/50 bg-secondary/80 text-secondary-foreground";
 
             return (
               <div

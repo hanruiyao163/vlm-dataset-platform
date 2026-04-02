@@ -17,7 +17,7 @@ export function ImageGrid({
 }) {
   if (items.length === 0) {
     return (
-      <div className="flex min-h-[320px] flex-col items-center justify-center rounded-[28px] border border-dashed border-border bg-white/70 text-center">
+      <div className="flex min-h-[320px] flex-col items-center justify-center rounded-[28px] border border-dashed border-border/60 bg-white/80 text-center shadow-soft backdrop-blur">
         <ImageOff className="mb-4 h-8 w-8 text-muted-foreground" />
         <p className="font-medium">这个筛选条件下还没有图片</p>
         <p className="mt-2 text-sm text-muted-foreground">先上传一个批次，或者放宽筛选条件。</p>
@@ -30,7 +30,7 @@ export function ImageGrid({
       {items.map((item) => {
         const checked = selectedIds.includes(item.id);
         return (
-          <article key={item.id} className="group overflow-hidden rounded-[24px] border border-white/60 bg-white/80 shadow-soft backdrop-blur">
+          <article key={item.id} className="group overflow-hidden rounded-[26px] border border-border/50 bg-white/90 shadow-soft backdrop-blur transition-all duration-200 hover:-translate-y-1.5 hover:border-primary/20 hover:shadow-float">
             <div className="relative">
               <img src={item.preview_url} alt={item.filename} className="h-56 w-full cursor-pointer object-cover" onClick={() => onOpen(item.id)} />
               <div className="absolute left-3 top-3">
@@ -39,7 +39,7 @@ export function ImageGrid({
             </div>
             <div className="space-y-3 p-4">
               <div>
-                <button className="line-clamp-1 font-medium hover:text-primary" onClick={() => onOpen(item.id)}>
+                <button className="line-clamp-1 font-medium transition-colors hover:text-primary group-hover:text-primary/80" onClick={() => onOpen(item.id)}>
                   {item.filename}
                 </button>
                 <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{item.relative_path}</p>
@@ -49,8 +49,8 @@ export function ImageGrid({
                 <span>{formatChinaDate(item.created_at)}</span>
               </div>
               <div className="flex gap-2 text-xs">
-                <span className="rounded-full bg-secondary px-2 py-1">描述 {item.description_count}</span>
-                <span className="rounded-full bg-accent px-2 py-1">问题 {item.question_count}</span>
+                <span className="rounded-full bg-secondary px-2 py-1 text-secondary-foreground">描述 {item.description_count}</span>
+                <span className="rounded-full bg-accent px-2 py-1 text-accent-foreground">问题 {item.question_count}</span>
               </div>
             </div>
           </article>

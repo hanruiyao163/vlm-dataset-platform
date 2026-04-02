@@ -128,7 +128,7 @@ export function ExportDatasetPanel({ projectId, imageIds }: { projectId: number;
             <Input value={filename} onChange={(event) => setFilename(event.target.value)} />
           </div>
         </div>
-        <div className="grid gap-4 rounded-2xl border border-border/70 bg-secondary/20 p-4 md:grid-cols-3">
+        <div className="grid gap-4 rounded-2xl border border-border/50 bg-secondary/20 p-4 md:grid-cols-3">
           <div>
             <p className="text-sm text-muted-foreground">图片总数</p>
             <p className="mt-1 text-2xl font-semibold">{imageIds.length}</p>
@@ -142,7 +142,7 @@ export function ExportDatasetPanel({ projectId, imageIds }: { projectId: number;
             <p className="mt-1 text-2xl font-semibold">{rows.length}</p>
           </div>
         </div>
-        <div className="rounded-2xl border border-dashed border-border/70 bg-white/60 p-4 text-sm text-muted-foreground">
+        <div className="rounded-2xl border border-dashed border-border/50 bg-white/65 p-4 text-sm text-muted-foreground">
           每条样本会导出为 `messages` 和 `images` 两个字段，用户消息格式为 `&lt;image&gt;问题内容`。普通描述会和同图下全部成功问题做组合；若描述是基于某条问题配对生成的，则只会导出对应的那组 QA，不再和其他问题交叉匹配。
         </div>
         <div className="flex justify-end">

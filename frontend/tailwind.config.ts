@@ -6,30 +6,34 @@ export default {
   theme: {
     extend: {
       colors: {
-        border: "hsl(28 22% 80%)",
-        input: "hsl(28 22% 80%)",
-        ring: "hsl(17 78% 46%)",
-        background: "hsl(38 45% 97%)",
-        foreground: "hsl(216 30% 14%)",
+        border: "hsl(228 18% 88%)",
+        input: "hsl(228 18% 88%)",
+        ring: "hsl(245 58% 51%)",
+        background: "hsl(228 28% 95.5%)",
+        foreground: "hsl(230 25% 13%)",
         primary: {
-          DEFAULT: "hsl(17 78% 46%)",
-          foreground: "hsl(36 60% 98%)",
+          DEFAULT: "hsl(245 58% 51%)",
+          foreground: "hsl(0 0% 100%)",
         },
         secondary: {
-          DEFAULT: "hsl(35 52% 90%)",
-          foreground: "hsl(216 30% 18%)",
+          DEFAULT: "hsl(230 22% 92%)",
+          foreground: "hsl(230 18% 20%)",
         },
         muted: {
-          DEFAULT: "hsl(35 30% 93%)",
-          foreground: "hsl(218 16% 38%)",
+          DEFAULT: "hsl(228 18% 89%)",
+          foreground: "hsl(228 10% 48%)",
         },
         accent: {
-          DEFAULT: "hsl(156 30% 86%)",
-          foreground: "hsl(160 30% 18%)",
+          DEFAULT: "hsl(168 42% 92%)",
+          foreground: "hsl(168 45% 25%)",
         },
         card: {
-          DEFAULT: "hsl(42 42% 99%)",
-          foreground: "hsl(216 30% 14%)",
+          DEFAULT: "hsl(0 0% 100%)",
+          foreground: "hsl(230 25% 13%)",
+        },
+        destructive: {
+          DEFAULT: "hsl(0 72% 51%)",
+          foreground: "hsl(0 0% 100%)",
         },
       },
       borderRadius: {
@@ -38,8 +42,8 @@ export default {
         sm: "0.65rem",
       },
       boxShadow: {
-        soft: "0 18px 50px rgba(52, 39, 24, 0.12)",
-        float: "0 24px 70px rgba(36, 24, 12, 0.16)",
+        soft: "0 2px 8px rgba(80, 80, 130, 0.06), 0 8px 28px rgba(80, 80, 130, 0.09)",
+        float: "0 8px 32px rgba(80, 80, 130, 0.14), 0 2px 10px rgba(80, 80, 130, 0.07)",
       },
     },
   },

@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PromptEditorFields } from "@/components/prompt-editor-fields";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
 export function ProjectImagesPage({
@@ -22,7 +22,7 @@ export function ProjectImagesPage({
   search,
 }: {
   projectId: number;
-  search: { batchId?: string; hasDescriptions?: string; hasQuestions?: string; offset?: number };
+  search: { batchId?: string; hasDescriptions?: string; hasQuestions?: string; offset?: number; };
 }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -99,9 +99,9 @@ export function ProjectImagesPage({
     mutationFn: () =>
       activeBatch
         ? api.updateBatch(projectId, activeBatch.id, {
-            default_description_prompt: descriptionPrompt,
-            default_question_prompt: questionPrompt,
-          })
+          default_description_prompt: descriptionPrompt,
+          default_question_prompt: questionPrompt,
+        })
         : Promise.reject(new Error("当前没有选中批次。")),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["batches", projectId] });
@@ -256,62 +256,62 @@ export function ProjectImagesPage({
             </>
           }
         />
-        <Card className="border-white/80 bg-white/85 shadow-soft backdrop-blur">
+        <Card className="border-border/50 bg-white/88 shadow-soft backdrop-blur">
           <CardContent className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-5">
-          <div className="space-y-2">
-            <Label className="text-xs text-muted-foreground">批次筛选</Label>
-            <Select value={search.batchId ?? "all"} onValueChange={(value) => setSearchParam({ batchId: value === "all" ? undefined : value, offset: 0 })}>
-              <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">全部批次</SelectItem>
-                {(batchesQuery.data ?? []).map((batch) => <SelectItem key={batch.id} value={String(batch.id)}>{batch.name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-muted-foreground">描述状态</Label>
-            <Select value={search.hasDescriptions ?? "all"} onValueChange={(value) => setSearchParam({ hasDescriptions: value === "all" ? undefined : value, offset: 0 })}>
-              <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">全部</SelectItem>
-                <SelectItem value="yes">已有描述</SelectItem>
-                <SelectItem value="no">暂无描述</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-muted-foreground">问题状态</Label>
-            <Select value={search.hasQuestions ?? "all"} onValueChange={(value) => setSearchParam({ hasQuestions: value === "all" ? undefined : value, offset: 0 })}>
-              <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">全部</SelectItem>
-                <SelectItem value="yes">已有问题</SelectItem>
-                <SelectItem value="no">暂无问题</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-muted-foreground">当前选择</Label>
-            <Input className="h-10" value={`${selectedIds.length} 张图片已选中`} readOnly />
-          </div>
-          <div className="space-y-2 md:col-span-2 xl:col-span-1">
-            <Label className="text-xs text-muted-foreground">模型选择</Label>
-            <Select value={resolvedSelectedModelProfile || undefined} onValueChange={setSelectedModelProfile}>
-              <SelectTrigger className="h-10">
-                <SelectValue placeholder="选择模型档案" />
-              </SelectTrigger>
-              <SelectContent>
-                {modelProfiles.map((profile) => (
-                  <SelectItem key={profile.name} value={profile.name}>
-                    {profile.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {activeModelProfile ? (
-              <p className="truncate text-xs text-muted-foreground pl-3">{activeModelProfile.model}</p>
-            ) : null}
-          </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">批次筛选</Label>
+              <Select value={search.batchId ?? "all"} onValueChange={(value) => setSearchParam({ batchId: value === "all" ? undefined : value, offset: 0 })}>
+                <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">全部批次</SelectItem>
+                  {(batchesQuery.data ?? []).map((batch) => <SelectItem key={batch.id} value={String(batch.id)}>{batch.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">描述状态</Label>
+              <Select value={search.hasDescriptions ?? "all"} onValueChange={(value) => setSearchParam({ hasDescriptions: value === "all" ? undefined : value, offset: 0 })}>
+                <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">全部</SelectItem>
+                  <SelectItem value="yes">已有描述</SelectItem>
+                  <SelectItem value="no">暂无描述</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">问题状态</Label>
+              <Select value={search.hasQuestions ?? "all"} onValueChange={(value) => setSearchParam({ hasQuestions: value === "all" ? undefined : value, offset: 0 })}>
+                <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">全部</SelectItem>
+                  <SelectItem value="yes">已有问题</SelectItem>
+                  <SelectItem value="no">暂无问题</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">当前选择</Label>
+              <Input className="h-10" value={`${selectedIds.length} 张图片已选中`} readOnly />
+            </div>
+            <div className="space-y-2 md:col-span-2 xl:col-span-1">
+              <Label className="text-xs text-muted-foreground">模型选择</Label>
+              <Select value={resolvedSelectedModelProfile || undefined} onValueChange={setSelectedModelProfile}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="选择模型档案" />
+                </SelectTrigger>
+                <SelectContent>
+                  {modelProfiles.map((profile) => (
+                    <SelectItem key={profile.name} value={profile.name}>
+                      {profile.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {activeModelProfile ? (
+                <p className="truncate text-xs text-muted-foreground pl-3">{activeModelProfile.model}</p>
+              ) : null}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -322,7 +322,7 @@ export function ProjectImagesPage({
         onToggle={(imageId, checked) => setSelectedIds((current) => checked ? Array.from(new Set([...current, imageId])) : current.filter((item) => item !== imageId))}
         onOpen={(imageId) => setPreviewImageId(imageId)}
       />
-      <div className="mt-6 rounded-2xl border border-border bg-white/80 p-4 text-center shadow-soft">
+      <div className="mt-6 rounded-2xl border border-border/60 bg-white/85 p-4 text-center shadow-soft">
         <p className="text-sm text-muted-foreground">已加载 {imageItems.length} / {totalImages} 张图片</p>
         <div ref={loadMoreRef} className="mt-3">
           {imagesQuery.isFetchingNextPage ? <p className="text-sm text-muted-foreground">继续加载中...</p> : null}
@@ -361,12 +361,14 @@ export function ProjectImagesPage({
             <DialogDescription>{promptDialogDescription}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <PromptEditorFields
-              descriptionPrompt={descriptionPrompt}
-              onDescriptionPromptChange={setDescriptionPrompt}
-              questionPrompt={questionPrompt}
-              onQuestionPromptChange={setQuestionPrompt}
-            />
+            <div className="space-y-2">
+              <Label>默认描述提示词</Label>
+              <Textarea value={descriptionPrompt} onChange={(event) => setDescriptionPrompt(event.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>默认问题提示词</Label>
+              <Textarea value={questionPrompt} onChange={(event) => setQuestionPrompt(event.target.value)} />
+            </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setPromptEditorOpen(false)}>
                 取消

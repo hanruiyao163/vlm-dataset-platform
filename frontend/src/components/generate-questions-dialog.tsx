@@ -116,7 +116,7 @@ export function GenerateQuestionsDialog({
           <DialogDescription>可以基于现有描述生成，也可以直接基于提示词和图片生成。</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="rounded-[20px] border border-border/70 bg-secondary/35 px-4 py-3 text-sm text-muted-foreground">
+          <div className="rounded-[20px] border border-border/50 bg-secondary/35 px-4 py-3 text-sm text-muted-foreground">
             当前使用模型：{selectedModelProfile || "未选择模型"}
           </div>
           <div className="space-y-2">
@@ -133,7 +133,7 @@ export function GenerateQuestionsDialog({
             {mode !== "prompt_image" ? <p className="text-sm text-muted-foreground">当前选中图片中有 {missingDescriptionCount} 张缺少成功描述。</p> : null}
           </div>
           {mode === "description" ? (
-            <div className="rounded-[20px] border border-border/70 bg-white/60 px-4 py-3">
+            <div className="rounded-[20px] border border-border/50 bg-white/65 px-4 py-3">
               <Label className="mb-3 block">描述生成问题时的参考范围</Label>
               <div className="flex flex-wrap gap-3">
                 <label className="flex cursor-pointer items-center gap-2 text-sm">
@@ -162,11 +162,11 @@ export function GenerateQuestionsDialog({
           {mode !== "prompt_image" ? (
             <div className="space-y-2">
               <Label>每张图片使用的描述</Label>
-              <div className="max-h-[240px] space-y-3 overflow-y-auto rounded-[20px] border border-border/70 bg-white/60 p-3">
+              <div className="max-h-[240px] space-y-3 overflow-y-auto rounded-[20px] border border-border/50 bg-white/65 p-3">
                 {(imageDetailQueries.data ?? []).map((item: ImageDetail) => {
                   const descriptions = availableDescriptions[item.id] ?? [];
                   return (
-                    <div key={item.id} className="grid gap-2 rounded-2xl border border-border/60 bg-background/80 p-3 md:grid-cols-[minmax(0,1fr)_280px] md:items-center">
+                    <div key={item.id} className="grid gap-2 rounded-2xl border border-border/50 bg-background/80 p-3 md:grid-cols-[minmax(0,1fr)_280px] md:items-center">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium">{item.filename}</p>
                         <p className="truncate text-xs text-muted-foreground">{item.relative_path}</p>
@@ -212,7 +212,7 @@ export function GenerateQuestionsDialog({
               <Input type="number" min={1} max={20} value={concurrency} onChange={(event) => setConcurrency(Number(event.target.value))} />
             </div>
           </div>
-          <div className="flex items-start gap-3 rounded-[20px] border border-border/70 bg-white/60 px-4 py-3">
+          <div className="flex items-start gap-3 rounded-[20px] border border-border/50 bg-white/65 px-4 py-3">
             <Checkbox
               id="structured-question"
               checked={useStructuredOutput}

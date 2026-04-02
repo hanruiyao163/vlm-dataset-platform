@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowUpRight, Folder, MessageSquareMore, ScanSearch } from "lucide-react";
+import { ArrowUpRight, Folder, MessageSquareMore, ScanSearch, Sparkles } from "lucide-react";
 
 import { api } from "@/lib/api";
 import type { Project } from "@/lib/types";
@@ -29,30 +29,34 @@ export function ProjectCard({ project }: { project: Project; }) {
   });
 
   return (
-    <Card className="overflow-hidden border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(250,244,235,0.60))]">
-      <CardHeader className="border-b border-border/60 bg-[radial-gradient(circle_at_top_right,rgba(201,97,37,0.14),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.72),rgba(247,239,228,0.72))]">
+    <Card className="group overflow-hidden border-border/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(240,242,248,0.94))] transition-shadow duration-200 hover:shadow-float">
+      <CardHeader className="border-b border-border/50 bg-[radial-gradient(circle_at_top_right,rgba(99,91,190,0.05),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.92),rgba(242,244,250,0.94))]">
         <div className="flex items-center justify-between">
           <Badge>{project.batch_count} 批次</Badge>
           <span className="text-xs font-medium text-muted-foreground">{formatChinaDateTime(project.created_at)}</span>
+        </div>
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary/70">
+          <Sparkles className="h-3.5 w-3.5" />
+          Dataset Pipeline
         </div>
         <CardTitle className="text-xl">{project.name}</CardTitle>
         <CardDescription className="line-clamp-2 min-h-10 leading-6">
           {project.note || "这个项目还没有备注。"}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 pt-6 pb-1">
+      <CardContent className="space-y-5 pt-6 pb-1">
         <div className="grid grid-cols-3 gap-3 text-sm">
-          <div className="rounded-[22px] border border-white/70 bg-white/70 p-3.5">
+          <div className="rounded-[22px] border border-border/40 bg-white/85 p-3.5 transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-soft">
             <Folder className="mb-3 h-4 w-4 text-primary" />
             <div className="text-xl font-semibold tracking-tight">{project.image_count}</div>
             <div className="text-muted-foreground">图片</div>
           </div>
-          <div className="rounded-[22px] border border-white/70 bg-white/70 p-3.5">
+          <div className="rounded-[22px] border border-border/40 bg-white/85 p-3.5 transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-soft">
             <ScanSearch className="mb-3 h-4 w-4 text-primary" />
             <div className="text-xl font-semibold tracking-tight">{project.description_count}</div>
             <div className="text-muted-foreground">描述</div>
           </div>
-          <div className="rounded-[22px] border border-white/70 bg-white/70 p-3.5">
+          <div className="rounded-[22px] border border-border/40 bg-white/85 p-3.5 transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-soft">
             <MessageSquareMore className="mb-3 h-4 w-4 text-primary" />
             <div className="text-xl font-semibold tracking-tight">{project.question_count}</div>
             <div className="text-muted-foreground">问题</div>
@@ -76,7 +80,7 @@ export function ProjectCard({ project }: { project: Project; }) {
           </Button>
         </div>
         <div className="flex justify-end">
-          <Button variant="ghost" size="sm" className="text-muted-foreground/80 hover:text-foreground" onClick={() => setConfirmOpen(true)}>
+          <Button variant="ghost" size="sm" className="text-muted-foreground/60 hover:bg-destructive/10 hover:text-destructive" onClick={() => setConfirmOpen(true)}>
             删除项目
           </Button>
         </div>
@@ -86,7 +90,7 @@ export function ProjectCard({ project }: { project: Project; }) {
           <DialogHeader>
             <DialogTitle>确认删除项目</DialogTitle>
             <DialogDescription>
-              删除后将一并移除项目“{project.name}”下的批次、图片和全部生成记录，这个操作不能撤销。
+              删除后将一并移除项目"{project.name}"下的批次、图片和全部生成记录，这个操作不能撤销。
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">

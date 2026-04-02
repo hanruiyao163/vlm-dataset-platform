@@ -12,7 +12,7 @@ import { formatChinaDateTime } from "@/lib/utils";
 export function LogsPage({
   search,
 }: {
-  search: { projectId?: string; batchId?: string; taskType?: string; status?: string };
+  search: { projectId?: string; batchId?: string; taskType?: string; status?: string; };
 }) {
   const navigate = useNavigate();
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -62,7 +62,7 @@ export function LogsPage({
     return () => observer.disconnect();
   }, [logsQuery.fetchNextPage, logsQuery.hasNextPage, logsQuery.isFetchingNextPage, items.length]);
 
-  const updateSearch = (partial: { projectId?: string; batchId?: string; taskType?: string; status?: string }) => {
+  const updateSearch = (partial: { projectId?: string; batchId?: string; taskType?: string; status?: string; }) => {
     navigate({
       to: "/logs",
       search: (previous) => ({
@@ -183,10 +183,10 @@ export function LogsPage({
       </div>
       <div className="space-y-4">
         {items.map((item) => (
-          <Card key={item.id} className="overflow-hidden">
+          <Card key={item.id} className="overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-float">
             <CardContent className="p-0">
               <div className="grid gap-0 xl:h-[220px] xl:grid-cols-[280px,1fr]">
-                <div className="min-h-0 overflow-y-auto border-b border-border/70 bg-secondary/20 p-4 xl:border-b-0 xl:border-r">
+                <div className="min-h-0 overflow-y-auto border-b border-border/50 bg-secondary/20 p-4 xl:border-b-0 xl:border-r">
                   <div className="mb-3 flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
@@ -212,7 +212,7 @@ export function LogsPage({
                     <p>时间：{formatChinaDateTime(item.created_at)}</p>
                   </div>
                   {item.source_record_type ? (
-                    <div className="mt-3 rounded-2xl border border-border/70 bg-white/75 p-3">
+                    <div className="mt-3 rounded-2xl border border-border/50 bg-white/80 p-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                         {item.source_record_type === "question" ? "强绑定来源" : "生成参考"}
                       </p>
@@ -239,7 +239,7 @@ export function LogsPage({
                 </div>
                 <div className="min-h-0 p-4">
                   <div className="grid h-full gap-3 lg:grid-cols-2">
-                    <div className="flex min-h-0 flex-col rounded-[20px] border border-border/70 bg-white/80 p-3">
+                    <div className="flex min-h-0 flex-col rounded-[20px] border border-border/50 bg-white/85 p-3">
                       <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">提示词</p>
                       <div className="min-h-0 flex-1 overflow-y-auto pr-1">
                         <p className="whitespace-pre-wrap text-sm leading-5 text-muted-foreground">{item.prompt || "未记录提示词。"}</p>
@@ -275,7 +275,7 @@ export function LogsPage({
           </Card>
         ) : null}
       </div>
-      <div ref={loadMoreRef} className="mt-6 rounded-2xl border border-border bg-white/80 p-4 text-center shadow-soft">
+      <div ref={loadMoreRef} className="mt-6 rounded-3xl border border-border/60 bg-white/85 p-4 text-center shadow-soft backdrop-blur">
         {logsQuery.isLoading ? <p className="text-sm text-muted-foreground">加载日志中...</p> : null}
         {logsQuery.isFetchingNextPage ? <p className="text-sm text-muted-foreground">继续加载中...</p> : null}
         {!logsQuery.hasNextPage && items.length > 0 ? <p className="text-sm text-muted-foreground">日志已经全部展示完了。</p> : null}

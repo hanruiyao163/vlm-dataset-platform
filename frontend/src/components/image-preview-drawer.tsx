@@ -106,7 +106,7 @@ export function ImagePreviewDrawer({
                 alt={query.data.filename}
                 className="min-h-0 flex-1 rounded-[28px] border border-border object-contain"
               />
-              <div className="rounded-2xl border border-border bg-secondary/40 p-4 text-sm text-muted-foreground">
+              <div className="rounded-2xl border border-border/50 bg-secondary/40 p-4 text-sm text-muted-foreground">
                 <p>文件名：{query.data.filename}</p>
                 <p>相对路径：{query.data.relative_path}</p>
                 <p>尺寸：{query.data.width} × {query.data.height}</p>

@@ -10,9 +10,10 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { PromptEditorFields } from "@/components/prompt-editor-fields";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
-export function ProjectOverviewPage({ projectId }: { projectId: number }) {
+export function ProjectOverviewPage({ projectId }: { projectId: number; }) {
   const { push } = useToast();
   const queryClient = useQueryClient();
   const projectQuery = useQuery({ queryKey: ["project", projectId], queryFn: () => api.getProject(projectId) });
@@ -117,37 +118,49 @@ export function ProjectOverviewPage({ projectId }: { projectId: number }) {
         </CardHeader>
         <CardContent className="space-y-3">
           {(batchesQuery.data ?? []).map((batch) => (
-            <div key={batch.id} className="flex items-center gap-3 rounded-2xl border border-border bg-secondary/20 p-3">
+            <div
+              key={batch.id}
+              className="group flex items-center gap-3 rounded-2xl border border-border/70 bg-white pl-0 pr-3 py-2.5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-soft overflow-hidden"
+            >
+              {/* 左侧指示条 */}
+              <div className="w-1 self-stretch rounded-full bg-primary/30 shrink-0 group-hover:bg-primary/60 transition-colors duration-200 ml-3" />
               <Link
                 to="/projects/$projectId/images"
                 params={{ projectId: String(projectId) }}
                 search={{ batchId: String(batch.id), hasDescriptions: undefined, hasQuestions: undefined, offset: 0 }}
-                className="flex min-w-0 flex-1 items-center justify-between rounded-xl px-2 py-1 transition-colors hover:bg-secondary/35"
+                className="flex min-w-0 flex-1 items-center justify-between rounded-xl px-2 py-2 transition-colors hover:text-primary"
               >
                 <div className="min-w-0">
-                  <p className="font-medium">{batch.name}</p>
+                  <p className="font-medium transition-colors group-hover:text-primary">{batch.name}</p>
                   <p className="truncate text-sm text-muted-foreground">{batch.source_folder || "未记录源文件夹"}</p>
                 </div>
                 <div className="shrink-0 text-right text-sm text-muted-foreground">
-                  <p>{batch.image_count} 张图片</p>
+                  <p className="font-medium tabular-nums">{batch.image_count} 张图片</p>
                   <p>{formatChinaDateTime(batch.created_at)}</p>
                 </div>
               </Link>
-              <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-muted-foreground hover:text-destructive" onClick={() => setPendingDeleteBatchId(batch.id)}>
-                删除批次
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 px-3 text-xs"
-                onClick={() => {
-                  setEditingBatchId(batch.id);
-                  setBatchDescriptionPrompt(batch.default_description_prompt || "");
-                  setBatchQuestionPrompt(batch.default_question_prompt || "");
-                }}
-              >
-                批次提示词
-              </Button>
+              <div className="flex items-center gap-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-3 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => setPendingDeleteBatchId(batch.id)}
+                >
+                  删除
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3 text-xs"
+                  onClick={() => {
+                    setEditingBatchId(batch.id);
+                    setBatchDescriptionPrompt(batch.default_description_prompt || "");
+                    setBatchQuestionPrompt(batch.default_question_prompt || "");
+                  }}
+                >
+                  提示词
+                </Button>
+              </div>
             </div>
           ))}
         </CardContent>
@@ -158,12 +171,14 @@ export function ProjectOverviewPage({ projectId }: { projectId: number }) {
           <CardDescription>这些提示词只跟当前项目绑定。新项目默认留空，由你按项目场景分别填写。</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <PromptEditorFields
-            descriptionPrompt={descriptionPrompt}
-            onDescriptionPromptChange={setDescriptionPrompt}
-            questionPrompt={questionPrompt}
-            onQuestionPromptChange={setQuestionPrompt}
-          />
+          <div className="space-y-2">
+            <Label>默认描述提示词</Label>
+            <Textarea value={descriptionPrompt} onChange={(event) => setDescriptionPrompt(event.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>默认问题提示词</Label>
+            <Textarea value={questionPrompt} onChange={(event) => setQuestionPrompt(event.target.value)} />
+          </div>
           <div className="flex justify-end">
             <Button
               className="min-w-[10rem]"
@@ -202,12 +217,14 @@ export function ProjectOverviewPage({ projectId }: { projectId: number }) {
             <DialogDescription>当前批次的默认提示词会优先于项目默认提示词，在图片工作台筛到该批次时自动带出。</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <PromptEditorFields
-              descriptionPrompt={batchDescriptionPrompt}
-              onDescriptionPromptChange={setBatchDescriptionPrompt}
-              questionPrompt={batchQuestionPrompt}
-              onQuestionPromptChange={setBatchQuestionPrompt}
-            />
+            <div className="space-y-2">
+              <Label>默认描述提示词</Label>
+              <Textarea value={batchDescriptionPrompt} onChange={(event) => setBatchDescriptionPrompt(event.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>默认问题提示词</Label>
+              <Textarea value={batchQuestionPrompt} onChange={(event) => setBatchQuestionPrompt(event.target.value)} />
+            </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setEditingBatchId(null)}>
                 取消

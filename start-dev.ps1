@@ -18,7 +18,7 @@ python -m uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000
 
 $frontendCommand = @"
 Set-Location -LiteralPath '$projectRoot\frontend'
-npm run dev -- --host 127.0.0.1
+npm run dev
 "@
 
 Start-Process pwsh -ArgumentList "-NoExit", "-Command", $backendCommand
