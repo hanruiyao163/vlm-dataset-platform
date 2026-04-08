@@ -5,7 +5,6 @@ import { RouterProvider } from "@tanstack/react-router";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { ToastStateProvider } from "@/hooks/use-toast";
 import { router } from "@/router";
 import "@/styles.css";
 
@@ -15,10 +14,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
       <QueryClientProvider client={queryClient}>
-        <ToastStateProvider>
-          <RouterProvider router={router} />
-          <Toaster position="top-right" richColors closeButton visibleToasts={4} offset={24} gap={10} />
-        </ToastStateProvider>
+        <RouterProvider router={router} />
+        <Toaster position="top-right" richColors closeButton visibleToasts={4} offset={24} gap={10} />
       </QueryClientProvider>
     </ThemeProvider>
   </React.StrictMode>,

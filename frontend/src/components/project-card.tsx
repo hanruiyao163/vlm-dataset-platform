@@ -4,9 +4,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowUpRight, Folder, MessageSquareMore, ScanSearch, Sparkles } from "lucide-react";
 
 import { api } from "@/lib/api";
+import { appToast } from "@/lib/toast";
 import type { Project } from "@/lib/types";
 import { formatChinaDateTime } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,16 +16,15 @@ export function ProjectCard({ project }: { project: Project; }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { push } = useToast();
   const deleteMutation = useMutation({
     mutationFn: () => api.deleteProject(project.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      push("项目已删除", project.name);
+      appToast.success("项目已删除", project.name);
       setConfirmOpen(false);
       navigate({ to: "/projects" });
     },
-    onError: (error: Error) => push("删除失败", error.message),
+    onError: (error: Error) => appToast.error("删除失败", error.message),
   });
 
   return (

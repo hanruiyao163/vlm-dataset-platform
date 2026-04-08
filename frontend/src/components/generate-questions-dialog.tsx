@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { api } from "@/lib/api";
+import { appToast } from "@/lib/toast";
 import type { ImageDetail } from "@/lib/types";
 import { formatChinaDateTime } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -38,7 +38,6 @@ export function GenerateQuestionsDialog({
   const [useStructuredOutput, setUseStructuredOutput] = useState(false);
   const [selectedDescriptionMap, setSelectedDescriptionMap] = useState<Record<number, number>>({});
   const queryClient = useQueryClient();
-  const { push } = useToast();
 
   useEffect(() => {
     if (!open) return;
@@ -98,19 +97,19 @@ export function GenerateQuestionsDialog({
       imageIds.forEach((imageId) => queryClient.invalidateQueries({ queryKey: ["image", imageId] }));
       if (useStructuredOutput && response.failed_images > 0) {
         const firstError = response.results.find((item) => item.error)?.error ?? "Structured output 返回异常，请检查模型兼容性或关闭该选项后重试。";
-        push("Structured Output 生成失败", firstError);
+        appToast.error("Structured Output 生成失败", firstError);
       }
-      push("问题生成完成", `成功 ${response.succeeded_images} 张，失败 ${response.failed_images} 张。`);
+      appToast.success("问题生成完成", `成功 ${response.succeeded_images} 张，失败 ${response.failed_images} 张。`);
       onOpenChange(false);
     },
-    onError: (error: Error) => push("问题生成失败", error.message),
+    onError: (error: Error) => appToast.error("问题生成失败", error.message),
   });
 
   const missingDescriptionCount = imageIds.filter((id) => !selectedDescriptionMap[id]).length;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="w-full sm:max-w-[calc(100%-2rem)] lg:max-w-4xl">
         <DialogHeader>
           <DialogTitle>批量生成问题</DialogTitle>
           <DialogDescription>可以基于现有描述生成，也可以直接基于提示词和图片生成。</DialogDescription>
@@ -162,7 +161,7 @@ export function GenerateQuestionsDialog({
           {mode !== "prompt_image" ? (
             <div className="space-y-2">
               <Label>每张图片使用的描述</Label>
-              <div className="max-h-[240px] space-y-3 overflow-y-auto rounded-[20px] border border-border/50 bg-white/65 p-3">
+              <div className="max-h-60 space-y-3 overflow-y-auto rounded-[20px] border border-border/50 bg-white/65 p-3">
                 {(imageDetailQueries.data ?? []).map((item: ImageDetail) => {
                   const descriptions = availableDescriptions[item.id] ?? [];
                   return (

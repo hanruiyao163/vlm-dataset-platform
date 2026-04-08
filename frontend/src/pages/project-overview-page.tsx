@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { api } from "@/lib/api";
 import { formatChinaDateTime } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
+import { appToast } from "@/lib/toast";
 import { BatchUploadDialog } from "@/components/batch-upload-dialog";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 export function ProjectOverviewPage({ projectId }: { projectId: number; }) {
-  const { push } = useToast();
   const queryClient = useQueryClient();
   const projectQuery = useQuery({ queryKey: ["project", projectId], queryFn: () => api.getProject(projectId) });
   const batchesQuery = useQuery({ queryKey: ["batches", projectId], queryFn: () => api.listBatches(projectId) });
@@ -41,9 +40,9 @@ export function ProjectOverviewPage({ projectId }: { projectId: number; }) {
     onSuccess: (project) => {
       queryClient.setQueryData(["project", projectId], project);
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      push("项目提示词已保存");
+      appToast.success("项目提示词已保存");
     },
-    onError: (error: Error) => push("保存失败", error.message),
+    onError: (error: Error) => appToast.error("保存失败", error.message),
   });
 
   const deleteBatchMutation = useMutation({
@@ -54,9 +53,9 @@ export function ProjectOverviewPage({ projectId }: { projectId: number; }) {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["images", projectId] });
       setPendingDeleteBatchId(null);
-      push("批次已删除");
+      appToast.success("批次已删除");
     },
-    onError: (error: Error) => push("删除失败", error.message),
+    onError: (error: Error) => appToast.error("删除失败", error.message),
   });
 
   const updateBatchMutation = useMutation({
@@ -68,9 +67,9 @@ export function ProjectOverviewPage({ projectId }: { projectId: number; }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["batches", projectId] });
       setEditingBatchId(null);
-      push("批次提示词已保存");
+      appToast.success("批次提示词已保存");
     },
-    onError: (error: Error) => push("保存失败", error.message),
+    onError: (error: Error) => appToast.error("保存失败", error.message),
   });
 
   return (

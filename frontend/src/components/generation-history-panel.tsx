@@ -3,9 +3,9 @@ import { ChevronDown, Trash2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { api } from "@/lib/api";
+import { appToast } from "@/lib/toast";
 import type { GenerationRecord } from "@/lib/types";
 import { formatChinaDateTime } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -69,7 +69,6 @@ function RecordSection({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editingContainerRef = useRef<HTMLDivElement | null>(null);
   const queryClient = useQueryClient();
-  const { push } = useToast();
 
   const relatedRecordMap = useMemo(
     () => new Map(relatedRecords.map((record) => [record.id, record])),
@@ -118,11 +117,11 @@ function RecordSection({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["image", imageId] });
       queryClient.invalidateQueries({ queryKey: ["images"] });
-      push(recordType === "description" ? "描述已保存" : "问题已保存");
+      appToast.success(recordType === "description" ? "描述已保存" : "问题已保存");
       setEditingId(null);
       setDraft("");
     },
-    onError: (error: Error) => push("保存失败", error.message),
+    onError: (error: Error) => appToast.error("保存失败", error.message),
   });
 
   const createMutation = useMutation({
@@ -133,10 +132,10 @@ function RecordSection({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["image", imageId] });
       queryClient.invalidateQueries({ queryKey: ["images"] });
-      push(recordType === "description" ? "描述已添加" : "问题已添加");
+      appToast.success(recordType === "description" ? "描述已添加" : "问题已添加");
       resetCreateState();
     },
-    onError: (error: Error) => push("新增失败", error.message),
+    onError: (error: Error) => appToast.error("新增失败", error.message),
   });
 
   const deleteMutation = useMutation({
@@ -145,12 +144,12 @@ function RecordSection({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["image", imageId] });
       queryClient.invalidateQueries({ queryKey: ["images"] });
-      push(recordType === "description" ? "描述已删除" : "问题已删除");
+      appToast.success(recordType === "description" ? "描述已删除" : "问题已删除");
       setEditingId(null);
       setPendingDeleteId(null);
       setDraft("");
     },
-    onError: (error: Error) => push("删除失败", error.message),
+    onError: (error: Error) => appToast.error("删除失败", error.message),
   });
 
   const persistDraft = () => {
@@ -161,7 +160,7 @@ function RecordSection({
         return;
       }
       if (recordType === "description" && createDescriptionMode === "paired" && !createQuestionId) {
-        push("请选择问题", "问题配对描述需要先指定它回答的是哪条问题。");
+        appToast.info("请选择问题", "问题配对描述需要先指定它回答的是哪条问题。");
         return;
       }
       createMutation.mutate({
@@ -176,7 +175,7 @@ function RecordSection({
     if (!nextContent) {
       setEditingId(null);
       setDraft("");
-      push("内容为空，未保存", "如需移除这条记录，请使用删除。");
+      appToast.info("内容为空，未保存", "如需移除这条记录，请使用删除。");
       return;
     }
     if (nextContent === original) {
@@ -295,7 +294,7 @@ function RecordSection({
                 ? "输入描述，点击外部区域自动保存"
                 : "输入人工补充的问题，点击外部区域自动保存"
             }
-            className="min-h-[160px]"
+            className="resize-none focus-visible:ring-0"
           />
         </div>
       ) : null}
@@ -416,7 +415,7 @@ function RecordSection({
                         <Textarea
                           value={draft}
                           onChange={(event) => setDraft(event.target.value)}
-                          className="min-h-[180px]"
+                          className="resize-none focus-visible:ring-0"
                         />
                       </div>
                     ) : (

@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { api } from "@/lib/api";
+import { appToast } from "@/lib/toast";
 import type { ImageDetail } from "@/lib/types";
 import { formatChinaDateTime } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -37,7 +37,6 @@ export function GenerateDescriptionsDialog({
   const [useStructuredOutput, setUseStructuredOutput] = useState(false);
   const [selectedQuestionMap, setSelectedQuestionMap] = useState<Record<number, number[]>>({});
   const queryClient = useQueryClient();
-  const { push } = useToast();
 
   useEffect(() => {
     if (!open) return;
@@ -96,12 +95,12 @@ export function GenerateDescriptionsDialog({
       imageIds.forEach((imageId) => queryClient.invalidateQueries({ queryKey: ["image", imageId] }));
       if (useStructuredOutput && response.failed_images > 0) {
         const firstError = response.results.find((item) => item.error)?.error ?? "Structured output 返回异常，请检查模型兼容性或关闭该选项后重试。";
-        push("Structured Output 生成失败", firstError);
+        appToast.error("Structured Output 生成失败", firstError);
       }
-      push("描述生成完成", `成功 ${response.succeeded_images} 张，失败 ${response.failed_images} 张。`);
+      appToast.success("描述生成完成", `成功 ${response.succeeded_images} 张，失败 ${response.failed_images} 张。`);
       onOpenChange(false);
     },
-    onError: (error: Error) => push("描述生成失败", error.message),
+    onError: (error: Error) => appToast.error("描述生成失败", error.message),
   });
 
   const missingQuestionCount = imageIds.filter((id) => !(selectedQuestionMap[id]?.length > 0)).length;
@@ -112,7 +111,7 @@ export function GenerateDescriptionsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="w-full sm:max-w-[calc(100%-2rem)] lg:max-w-4xl">
         <DialogHeader>
           <DialogTitle>批量生成图片描述</DialogTitle>
           <DialogDescription>对当前选择的图片并发生成描述，并保留所有历史记录。</DialogDescription>

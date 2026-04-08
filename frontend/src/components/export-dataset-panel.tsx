@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { api } from "@/lib/api";
+import { appToast } from "@/lib/toast";
 import type { ImageDetail } from "@/lib/types";
-import { useToast } from "@/hooks/use-toast";
 import { formatChinaFilenameTimestamp } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,7 +25,6 @@ type SaveFilePickerWindow = Window & {
 export function ExportDatasetPanel({ projectId, imageIds }: { projectId: number; imageIds: number[] }) {
   const [filename, setFilename] = useState(`qwen-messages-${formatChinaFilenameTimestamp()}.json`);
   const [isExporting, setIsExporting] = useState(false);
-  const { push } = useToast();
 
   const query = useQuery({
     queryKey: ["export-images", projectId, imageIds],
@@ -77,7 +76,7 @@ export function ExportDatasetPanel({ projectId, imageIds }: { projectId: number;
 
   const handleExport = async () => {
     if (rows.length === 0) {
-      push("没有可导出的样本");
+      appToast.info("没有可导出的样本");
       return;
     }
 
@@ -95,7 +94,7 @@ export function ExportDatasetPanel({ projectId, imageIds }: { projectId: number;
         const writable = await handle.createWritable();
         await writable.write(payload);
         await writable.close();
-        push("导出成功", `已保存 ${rows.length} 条样本。`);
+        appToast.success("导出成功", `已保存 ${rows.length} 条样本。`);
         return;
       }
 
@@ -106,10 +105,10 @@ export function ExportDatasetPanel({ projectId, imageIds }: { projectId: number;
       anchor.download = safeFilename;
       anchor.click();
       URL.revokeObjectURL(url);
-      push("导出成功", `已下载 ${rows.length} 条样本。`);
+      appToast.success("导出成功", `已下载 ${rows.length} 条样本。`);
     } catch (error) {
       const message = error instanceof Error ? error.message : "导出失败";
-      push("导出失败", message);
+      appToast.error("导出失败", message);
     } finally {
       setIsExporting(false);
     }

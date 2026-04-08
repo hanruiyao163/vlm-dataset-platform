@@ -8,6 +8,7 @@ import { GenerateQuestionsDialog } from "@/components/generate-questions-dialog"
 import { ImageGrid } from "@/components/image-grid";
 import { ImagePreviewDrawer } from "@/components/image-preview-drawer";
 import { PageHeader } from "@/components/page-header";
+import { appToast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -15,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 
 export function ProjectImagesPage({
   projectId,
@@ -26,7 +26,6 @@ export function ProjectImagesPage({
 }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { push } = useToast();
   const modelStorageKey = `project-images:selected-model:${projectId}`;
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [previewImageId, setPreviewImageId] = useState<number | null>(null);
@@ -91,9 +90,9 @@ export function ProjectImagesPage({
       queryClient.setQueryData(["project", projectId], project);
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       setPromptEditorOpen(false);
-      push("项目提示词已保存");
+      appToast.success("项目提示词已保存");
     },
-    onError: (error: Error) => push("保存失败", error.message),
+    onError: (error: Error) => appToast.error("保存失败", error.message),
   });
   const saveBatchPromptMutation = useMutation({
     mutationFn: () =>
@@ -106,9 +105,9 @@ export function ProjectImagesPage({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["batches", projectId] });
       setPromptEditorOpen(false);
-      push("批次提示词已保存");
+      appToast.success("批次提示词已保存");
     },
-    onError: (error: Error) => push("保存失败", error.message),
+    onError: (error: Error) => appToast.error("保存失败", error.message),
   });
   const deleteImagesMutation = useMutation({
     mutationFn: () => api.deleteProjectImages(projectId, selectedIds),
@@ -122,9 +121,9 @@ export function ProjectImagesPage({
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["batches", projectId] });
       queryClient.invalidateQueries({ queryKey: ["logs"] });
-      push("图片索引已删除", "仅删除平台中的图片、描述和问题记录，不会删除硬盘原图。");
+      appToast.success("图片索引已删除", "仅删除平台中的图片、描述和问题记录，不会删除硬盘原图。");
     },
-    onError: (error: Error) => push("删除失败", error.message),
+    onError: (error: Error) => appToast.error("删除失败", error.message),
   });
 
   useEffect(() => {
@@ -242,7 +241,7 @@ export function ProjectImagesPage({
                 disabled={!search.batchId || allImageIdsQuery.isLoading}
                 onClick={toggleSelectCurrentBatch}
               >
-                {allImageIdsQuery.isLoading ? "读取中..." : isCurrentBatchFullySelected ? "取消全选" : "全选当前批次"}
+                {allImageIdsQuery.isLoading ? "读取中..." : isCurrentBatchFullySelected ? "取消全选" : `全选当前批次 (${currentBatchImageIds.length})`}
               </Button>
               <Button size="sm" onClick={() => setDescriptionOpen(true)} disabled={selectedIds.length === 0}>
                 生成描述
@@ -263,8 +262,8 @@ export function ProjectImagesPage({
               <Select value={search.batchId ?? "all"} onValueChange={(value) => setSearchParam({ batchId: value === "all" ? undefined : value, offset: 0 })}>
                 <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">全部批次</SelectItem>
-                  {(batchesQuery.data ?? []).map((batch) => <SelectItem key={batch.id} value={String(batch.id)}>{batch.name}</SelectItem>)}
+                  <SelectItem value="all">全部批次 ({projectQuery.data?.image_count ?? 0})</SelectItem>
+                  {(batchesQuery.data ?? []).map((batch) => <SelectItem key={batch.id} value={String(batch.id)}>{batch.name} ({batch.image_count})</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -292,7 +291,7 @@ export function ProjectImagesPage({
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">当前选择</Label>
-              <Input className="h-8" value={`${selectedIds.length} 张图片已选中`} readOnly />
+              <Input className="h-10" value={`${selectedIds.length} / ${totalImages} 张图片已选中`} readOnly />
             </div>
             <div className="space-y-1.5 md:col-span-2 xl:col-span-1">
               <Label className="text-xs text-muted-foreground">模型选择</Label>
@@ -356,7 +355,7 @@ export function ProjectImagesPage({
         onOpenChange={setQuestionOpen}
       />
       <Dialog open={promptEditorOpen} onOpenChange={setPromptEditorOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="min-w-3xl">
           <DialogHeader>
             <DialogTitle>{promptDialogTitle}</DialogTitle>
             <DialogDescription>{promptDialogDescription}</DialogDescription>

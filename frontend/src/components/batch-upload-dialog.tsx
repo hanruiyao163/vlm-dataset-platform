@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 
 import { api } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
+import { appToast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,13 +22,12 @@ export function BatchUploadDialog({ projectId }: { projectId: number }) {
   const [batchName, setBatchName] = useState("");
   const [sourceFolder, setSourceFolder] = useState("");
   const queryClient = useQueryClient();
-  const { push } = useToast();
   const pickDirectoryMutation = useMutation({
     mutationFn: () => api.pickBatchDirectory(projectId),
     onSuccess: ({ path }) => setSourceFolder(path),
     onError: (error: Error) => {
       if (error.message.includes("未选择任何目录")) return;
-      push("选择目录失败", error.message);
+      appToast.error("选择目录失败", error.message);
     },
   });
 
@@ -38,7 +37,7 @@ export function BatchUploadDialog({ projectId }: { projectId: number }) {
       queryClient.invalidateQueries({ queryKey: ["project", projectId] });
       queryClient.invalidateQueries({ queryKey: ["batches", projectId] });
       queryClient.invalidateQueries({ queryKey: ["images", projectId] });
-      push("登记完成", `批次 ${batch.name} 已登记 ${batch.image_count} 张图片。`);
+      appToast.success("登记完成", `批次 ${batch.name} 已登记 ${batch.image_count} 张图片。`);
       setSourceFolder("");
       setBatchName("");
       setOpen(false);
@@ -48,7 +47,7 @@ export function BatchUploadDialog({ projectId }: { projectId: number }) {
         search: { batchId: String(batch.id), hasDescriptions: undefined, hasQuestions: undefined, offset: 0 },
       });
     },
-    onError: (error: Error) => push("登记失败", error.message),
+    onError: (error: Error) => appToast.error("登记失败", error.message),
   });
 
   return (
@@ -56,7 +55,7 @@ export function BatchUploadDialog({ projectId }: { projectId: number }) {
       <DialogTrigger asChild>
         <Button>登记批次</Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="min-w-2xl">
         <DialogHeader>
           <DialogTitle>登记图片批次</DialogTitle>
           <DialogDescription>输入本机图片目录路径，系统会直接扫描该目录并登记图片，不会复制图片文件到平台目录。</DialogDescription>

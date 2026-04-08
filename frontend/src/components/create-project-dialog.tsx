@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
 import { api } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
+import { appToast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,17 +23,16 @@ export function CreateProjectDialog() {
   const [open, setOpen] = useState(false);
   const { register, handleSubmit, reset } = useForm<FormValues>();
   const queryClient = useQueryClient();
-  const { push } = useToast();
 
   const mutation = useMutation({
     mutationFn: api.createProject,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      push("项目已创建");
+      appToast.success("项目已创建");
       reset({ name: "", note: "" });
       setOpen(false);
     },
-    onError: (error: Error) => push("创建失败", error.message),
+    onError: (error: Error) => appToast.error("创建失败", error.message),
   });
 
   return (

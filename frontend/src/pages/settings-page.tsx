@@ -4,8 +4,8 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { Bot, ChevronDown, Gauge, Link2, Plus, Trash2 } from "lucide-react";
 
 import { api } from "@/lib/api";
+import { appToast } from "@/lib/toast";
 import type { ModelSettings } from "@/lib/types";
-import { useToast } from "@/hooks/use-toast";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +16,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 type FormValues = Omit<ModelSettings, "id">;
 
 export function SettingsPage() {
-  const { push } = useToast();
   const queryClient = useQueryClient();
   const query = useQuery({ queryKey: ["settings"], queryFn: api.getSettings });
   const form = useForm<FormValues>({
@@ -47,15 +46,15 @@ export function SettingsPage() {
     mutationFn: api.updateSettings,
     onSuccess: (data) => {
       queryClient.setQueryData(["settings"], data);
-      push("设置已保存");
+      appToast.success("设置已保存");
     },
-    onError: (error: Error) => push("保存失败", error.message),
+    onError: (error: Error) => appToast.error("保存失败", error.message),
   });
 
   const testMutation = useMutation({
     mutationFn: (modelProfile: string) => api.testSettings("请只回复 OK", modelProfile),
-    onSuccess: (response) => push("连接测试完成", response.message),
-    onError: (error: Error) => push("连接测试失败", error.message),
+    onSuccess: (response) => appToast.success("连接测试完成", response.message),
+    onError: (error: Error) => appToast.error("连接测试失败", error.message),
   });
   const watchedProfiles = form.watch("model_profiles");
   const selectedDefaultProfile = watchedProfiles.find((profile) => profile.name === form.watch("model"));

@@ -1,9 +1,9 @@
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { api } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
+import { appToast } from "@/lib/toast";
 import { GenerationHistoryPanel } from "@/components/generation-history-panel";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -21,24 +21,63 @@ export function ImagePreviewDrawer({
   onOpenChange: (open: boolean) => void;
   onNavigateTo: (imageId: number) => void;
 }) {
-  const { push } = useToast();
   const query = useQuery({
     queryKey: ["image", imageId],
     queryFn: () => api.getImage(imageId!),
     enabled: open && imageId !== null,
   });
+  const queryClient = useQueryClient();
   const currentIndex = imageId ? imageIds.indexOf(imageId) : -1;
   const currentPosition = currentIndex >= 0 ? `${currentIndex + 1} / ${imageIds.length}` : null;
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const deleteMutation = useMutation({
+    mutationFn: (params: { projectId: number; imageId: number }) =>
+      api.deleteProjectImages(params.projectId, [params.imageId]),
+    onSuccess: (_, variables) => {
+      appToast.success("图片已删除");
+      queryClient.invalidateQueries({ queryKey: ["images", variables.projectId] });
+      queryClient.invalidateQueries({ queryKey: ["image-ids", variables.projectId] });
+      queryClient.invalidateQueries({ queryKey: ["project", variables.projectId] });
+    },
+    onSettled: () => setIsDeleting(false),
+    onError: (error: Error) => appToast.error("删除失败", error.message),
+  });
+
+  const handleDelete = () => {
+    if (!query.data || !imageId || isDeleting) return;
+    if (!window.confirm("确定要删除这张图片吗？此操作不可撤销。")) return;
+
+    setIsDeleting(true);
+    const projectId = query.data.project_id;
+
+    // Determine where to go next
+    if (imageIds.length <= 1) {
+      // Only one image left, close after delete
+      deleteMutation.mutate({ projectId, imageId }, {
+        onSuccess: () => onOpenChange(false)
+      });
+    } else {
+      // Find the next target before the current ID disappears from the list
+      const nextTargetId = currentIndex < imageIds.length - 1 
+        ? imageIds[currentIndex + 1] 
+        : imageIds[currentIndex - 1];
+        
+      deleteMutation.mutate({ projectId, imageId }, {
+        onSuccess: () => onNavigateTo(nextTargetId)
+      });
+    }
+  };
 
   const navigateImage = (direction: "prev" | "next") => {
     if (currentIndex === -1) return;
     const nextIndex = direction === "prev" ? currentIndex - 1 : currentIndex + 1;
     if (nextIndex < 0) {
-      push("已经是第一张图片");
+      appToast.info("已经是第一张图片");
       return;
     }
     if (nextIndex >= imageIds.length) {
-      push("已经是最后一张图片");
+      appToast.info("已经是最后一张图片");
       return;
     }
     onNavigateTo(imageIds[nextIndex]);
@@ -62,7 +101,7 @@ export function ImagePreviewDrawer({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex h-[88vh] w-[min(96vw,1720px)] max-w-none flex-col overflow-hidden p-8">
+      <DialogContent className="flex h-[90vh] w-[min(96vw,1720px)] max-w-none sm:max-w-none flex-col overflow-hidden p-8">
         <DialogHeader>
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -83,6 +122,16 @@ export function ImagePreviewDrawer({
               >
                 <ChevronLeft className="h-4 w-4" />
                 前一张
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive focus-visible:ring-0 focus-visible:ring-offset-0"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                <Trash2 className="h-4 w-4" />
+                删除
               </Button>
               <Button
                 variant="outline"
