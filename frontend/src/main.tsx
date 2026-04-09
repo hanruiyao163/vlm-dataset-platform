@@ -15,7 +15,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
-        <Toaster position="top-right" richColors closeButton visibleToasts={4} offset={24} gap={10} />
+        <Toaster position="top-center" richColors closeButton visibleToasts={4} offset={24} gap={10} />
       </QueryClientProvider>
     </ThemeProvider>
   </React.StrictMode>,

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFieldArray, useForm } from "react-hook-form";
 import { Bot, ChevronDown, Gauge, Link2, Plus, Trash2 } from "lucide-react";
@@ -18,6 +18,7 @@ type FormValues = Omit<ModelSettings, "id">;
 export function SettingsPage() {
   const queryClient = useQueryClient();
   const query = useQuery({ queryKey: ["settings"], queryFn: api.getSettings });
+  const [testingProfileName, setTestingProfileName] = useState<string | null>(null);
   const form = useForm<FormValues>({
     defaultValues: {
       api_key: "",
@@ -55,6 +56,7 @@ export function SettingsPage() {
     mutationFn: (modelProfile: string) => api.testSettings("请只回复 OK", modelProfile),
     onSuccess: (response) => appToast.success("连接测试完成", response.message),
     onError: (error: Error) => appToast.error("连接测试失败", error.message),
+    onSettled: () => setTestingProfileName(null),
   });
   const watchedProfiles = form.watch("model_profiles");
   const selectedDefaultProfile = watchedProfiles.find((profile) => profile.name === form.watch("model"));
@@ -148,6 +150,13 @@ export function SettingsPage() {
                         </div>
                       </div>
                       <div className="mt-4 flex justify-end">
+                        {(() => {
+                          const fallbackName = watchedProfiles[index]?.model?.trim();
+                          const currentName = watchedProfiles[index]?.name?.trim();
+                          const resolvedName = currentName || fallbackName;
+                          const isTestingCurrent = Boolean(resolvedName && testingProfileName === resolvedName);
+
+                          return (
                         <Button
                           type="button"
                           variant="outline"
@@ -155,21 +164,22 @@ export function SettingsPage() {
                             testMutation.isPending ||
                             !watchedProfiles[index]?.base_url?.trim() ||
                             !watchedProfiles[index]?.api_key?.trim() ||
-                            !watchedProfiles[index]?.model?.trim()
+                            !watchedProfiles[index]?.model?.trim() ||
+                            !resolvedName
                           }
                           onClick={() => {
-                            const fallbackName = watchedProfiles[index]?.model?.trim();
-                            const currentName = watchedProfiles[index]?.name?.trim();
-                            const resolvedName = currentName || fallbackName;
                             if (!resolvedName) return;
                             if (!currentName) {
                               form.setValue(`model_profiles.${index}.name`, resolvedName, { shouldDirty: true });
                             }
+                            setTestingProfileName(resolvedName);
                             testMutation.mutate(resolvedName);
                           }}
                         >
-                          {testMutation.isPending ? "测试中..." : "测试连接"}
+                          {isTestingCurrent ? "测试中..." : "测试连接"}
                         </Button>
+                          );
+                        })()}
                       </div>
                     </div>
                   </details>

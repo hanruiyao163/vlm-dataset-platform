@@ -68,6 +68,7 @@ function RecordSection({
   const [createQuestionId, setCreateQuestionId] = useState<string>("");
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editingContainerRef = useRef<HTMLDivElement | null>(null);
+  const confirmDeleteRef = useRef<HTMLButtonElement | null>(null);
   const queryClient = useQueryClient();
 
   const relatedRecordMap = useMemo(
@@ -110,7 +111,7 @@ function RecordSection({
   };
 
   const updateMutation = useMutation({
-    mutationFn: ({ recordId, content }: { recordId: number; content: string }) =>
+    mutationFn: ({ recordId, content }: { recordId: number; content: string; }) =>
       recordType === "description"
         ? api.updateDescription(recordId, { content })
         : api.updateQuestion(recordId, content),
@@ -125,7 +126,7 @@ function RecordSection({
   });
 
   const createMutation = useMutation({
-    mutationFn: ({ content, questionId }: { content: string; questionId?: number }) =>
+    mutationFn: ({ content, questionId }: { content: string; questionId?: number; }) =>
       recordType === "description"
         ? api.createDescription(imageId, { content, paired_question_id: questionId })
         : api.createQuestion(imageId, content),
@@ -241,22 +242,20 @@ function RecordSection({
                 <button
                   type="button"
                   onClick={() => setCreateDescriptionMode("general")}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                    createDescriptionMode === "general"
+                  className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${createDescriptionMode === "general"
                       ? "bg-secondary text-foreground"
                       : "bg-secondary/40 text-muted-foreground"
-                  }`}
+                    }`}
                 >
                   通用描述
                 </button>
                 <button
                   type="button"
                   onClick={() => setCreateDescriptionMode("paired")}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                    createDescriptionMode === "paired"
+                  className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${createDescriptionMode === "paired"
                       ? "bg-primary/15 text-primary"
                       : "bg-secondary/40 text-muted-foreground"
-                  }`}
+                    }`}
                 >
                   问题配对描述
                 </button>
@@ -352,13 +351,12 @@ function RecordSection({
             return (
               <div
                 key={record.id}
-                className={`overflow-hidden rounded-[24px] border transition-colors ${
-                  isActive
+                className={`overflow-hidden rounded-3xl border transition-colors ${isActive
                     ? tone === "secondary"
                       ? "border-primary/25 bg-secondary/45"
                       : "border-primary/25 bg-accent/40"
                     : "border-border/60 bg-white/45"
-                }`}
+                  }`}
               >
                 <button
                   data-record-trigger="true"
@@ -384,9 +382,8 @@ function RecordSection({
                     </div>
                   </div>
                   <ChevronDown
-                    className={`mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform ${
-                      isExpanded ? "rotate-180" : ""
-                    }`}
+                    className={`mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
                 {isExpanded ? (
@@ -438,7 +435,13 @@ function RecordSection({
         </div>
       )}
       <Dialog open={pendingDeleteId !== null} onOpenChange={(open) => !open && setPendingDeleteId(null)}>
-        <DialogContent className="max-w-md">
+        <DialogContent
+          className="max-w-md"
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            confirmDeleteRef.current?.focus();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{recordType === "description" ? "删除描述" : "删除问题"}</DialogTitle>
             <DialogDescription>删除后无法恢复，确认继续吗？</DialogDescription>
@@ -448,6 +451,7 @@ function RecordSection({
               取消
             </Button>
             <Button
+              ref={confirmDeleteRef}
               size="sm"
               onClick={() => pendingDeleteId !== null && deleteMutation.mutate(pendingDeleteId)}
               disabled={deleteMutation.isPending}
@@ -461,7 +465,7 @@ function RecordSection({
   );
 }
 
-function RecordContent({ text }: { text: string }) {
+function RecordContent({ text }: { text: string; }) {
   const paragraphs = text.split(/\n{2,}/).filter(Boolean);
   const items = paragraphs.length > 0 ? paragraphs : [text];
 
