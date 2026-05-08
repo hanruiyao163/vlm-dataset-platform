@@ -2,18 +2,10 @@ $ErrorActionPreference = "Stop"
 
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-if (-not (Get-Command conda -ErrorAction SilentlyContinue)) {
-  throw "未找到 conda 命令，请先确认 Anaconda/Miniconda 已安装并已加入 PATH。"
-}
-
-if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-  throw "未找到 npm 命令，请先确认 Node.js 已安装并已加入 PATH。"
-}
 
 $backendCommand = @"
 Set-Location -LiteralPath '$projectRoot'
-conda activate pypi
-python -m uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000
+uv run python -m uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000
 "@
 
 $frontendCommand = @"
