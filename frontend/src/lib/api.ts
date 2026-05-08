@@ -140,6 +140,7 @@ export const api = {
     request<MessageResponse>(`/api/questions/${recordId}`, {
       method: "DELETE",
     }),
+  getProgress: (taskId: string) => request<{ current: number; total: number }>(`/api/progress?task_id=${taskId}`),
   generateDescriptions: (payload: {
     image_ids: number[];
     model_profile?: string;
@@ -149,6 +150,7 @@ export const api = {
     count_per_image: number;
     concurrency: number;
     use_structured_output?: boolean;
+    task_id?: string;
   }) =>
     request<BatchGenerationResponse>("/api/descriptions/generate", {
       method: "POST",
@@ -164,18 +166,20 @@ export const api = {
     count_per_image: number;
     concurrency: number;
     use_structured_output?: boolean;
+    task_id?: string;
   }) =>
     request<BatchGenerationResponse>("/api/questions/generate", {
       method: "POST",
       headers,
       body: JSON.stringify(payload),
     }),
-  exportShareGPT: (payload: {
+  exportJson: (payload: {
     project_id: number;
-    image_field: string;
+    image_path_prefix?: string;
+    trimmed_parent_levels?: number;
     items: Array<{ image_id: number; question_id: number; answer_source: "description"; answer_id: number }>;
   }) =>
-    request<ExportResponse>("/api/exports/sharegpt", {
+    request<ExportResponse>("/api/exports/json", {
       method: "POST",
       headers,
       body: JSON.stringify(payload),

@@ -400,7 +400,7 @@ function RecordSection({
                       </Button>
                     </div>
                     {relationRecord ? (
-                      <div className="mx-2 mb-3 flex items-center gap-2 rounded-2xl border border-border/70 bg-white/70 px-3 py-2">
+                      <div className="mr-8 mb-3 flex items-center gap-2 rounded-2xl border border-border/70 bg-white/70 px-3 py-2">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                           {recordType === "description" ? "强绑定回答" : "生成参考"}
                         </p>
@@ -470,7 +470,7 @@ function RecordContent({ text }: { text: string; }) {
   const items = paragraphs.length > 0 ? paragraphs : [text];
 
   return (
-    <div className="space-y-3 text-sm">
+    <div className="space-y-3 text-sm mr-2">
       {items.map((paragraph, index) => (
         <p key={`${index}-${paragraph.slice(0, 20)}`} className="whitespace-pre-wrap leading-normal">
           {paragraph}

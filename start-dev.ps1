@@ -17,5 +17,5 @@ Start-Process pwsh -ArgumentList "-NoExit", "-Command", $backendCommand
 Start-Process pwsh -ArgumentList "-NoExit", "-Command", $frontendCommand
 
 Write-Host "前后端启动窗口已打开。"
-Write-Host "前端: http://127.0.0.1:5173"
-Write-Host "后端: http://127.0.0.1:8000"
+Write-Host "前端: http://localhost:5173"
+Write-Host "后端: http://localhost:8000"

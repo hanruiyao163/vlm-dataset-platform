@@ -363,11 +363,11 @@ export function ProjectImagesPage({
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>默认描述提示词</Label>
-              <Textarea value={descriptionPrompt} onChange={(event) => setDescriptionPrompt(event.target.value)} />
+              <Textarea className="min-h-[180px]" value={descriptionPrompt} onChange={(event) => setDescriptionPrompt(event.target.value)} />
             </div>
             <div className="space-y-2">
               <Label>默认问题提示词</Label>
-              <Textarea value={questionPrompt} onChange={(event) => setQuestionPrompt(event.target.value)} />
+              <Textarea className="min-h-[180px]" value={questionPrompt} onChange={(event) => setQuestionPrompt(event.target.value)} />
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setPromptEditorOpen(false)}>

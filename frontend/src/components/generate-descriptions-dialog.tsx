@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 
 export function GenerateDescriptionsDialog({
   projectId,
@@ -36,6 +37,8 @@ export function GenerateDescriptionsDialog({
   const [concurrency, setConcurrency] = useState(defaultConcurrency || 3);
   const [useStructuredOutput, setUseStructuredOutput] = useState(false);
   const [selectedQuestionMap, setSelectedQuestionMap] = useState<Record<number, number[]>>({});
+  const [taskId, setTaskId] = useState<string>("");
+  const [progressData, setProgressData] = useState<{ current: number; total: number } | null>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -77,7 +80,7 @@ export function GenerateDescriptionsDialog({
   }, [defaultQuestionIdMap, imageDetailQueries.isLoading, open]);
 
   const mutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (newTaskId: string) =>
       api.generateDescriptions({
         image_ids: imageIds,
         model_profile: selectedModelProfile,
@@ -87,6 +90,7 @@ export function GenerateDescriptionsDialog({
         count_per_image: countPerImage,
         concurrency,
         use_structured_output: useStructuredOutput,
+        task_id: newTaskId,
       }),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["images", projectId] });
@@ -102,6 +106,22 @@ export function GenerateDescriptionsDialog({
     },
     onError: (error: Error) => appToast.error("描述生成失败", error.message),
   });
+
+  useEffect(() => {
+    if (!mutation.isPending || !taskId) {
+      setProgressData(null);
+      return;
+    }
+    const intervalId = setInterval(async () => {
+      try {
+        const data = await api.getProgress(taskId);
+        if (data.total > 0) setProgressData(data);
+      } catch (err) {
+        // ignore
+      }
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, [mutation.isPending, taskId]);
 
   const missingQuestionCount = imageIds.filter((id) => !(selectedQuestionMap[id]?.length > 0)).length;
   const structuredOutputHint =
@@ -189,7 +209,7 @@ export function GenerateDescriptionsDialog({
           ) : null}
           <div className="space-y-2">
             <Label>提示词模板</Label>
-            <Textarea value={promptTemplate} onChange={(event) => setPromptTemplate(event.target.value)} />
+            <Textarea className="min-h-[180px]" value={promptTemplate} onChange={(event) => setPromptTemplate(event.target.value)} />
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
@@ -213,6 +233,17 @@ export function GenerateDescriptionsDialog({
             </div>
           </div>
           <div className="flex justify-end gap-2">
+            {mutation.isPending && progressData && progressData.total > 0 ? (
+              <div className="flex-1 flex items-center pr-4">
+                <div className="w-full space-y-1">
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>生成进度</span>
+                    <span className="tabular-nums">{progressData.current} / {progressData.total}</span>
+                  </div>
+                  <Progress value={(progressData.current / progressData.total) * 100} className="h-2" />
+                </div>
+              </div>
+            ) : null}
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               取消
             </Button>
@@ -223,7 +254,11 @@ export function GenerateDescriptionsDialog({
                 !selectedModelProfile ||
                 (mode === "question_image" && missingQuestionCount > 0)
               }
-              onClick={() => mutation.mutate()}
+              onClick={() => {
+                const newTaskId = Math.random().toString(36).substring(2);
+                setTaskId(newTaskId);
+                mutation.mutate(newTaskId);
+              }}
             >
               {mutation.isPending ? "生成中..." : `为 ${imageIds.length} 张图片生成描述`}
             </Button>

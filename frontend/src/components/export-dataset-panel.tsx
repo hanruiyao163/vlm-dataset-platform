@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 type SaveFilePickerWindow = Window & {
   showSaveFilePicker?: (options?: {
     suggestedName?: string;
-    types?: Array<{ description?: string; accept: Record<string, string[]> }>;
+    types?: Array<{ description?: string; accept: Record<string, string[]>; }>;
   }) => Promise<{
     createWritable: () => Promise<{
       write: (data: string) => Promise<void>;
@@ -22,8 +22,10 @@ type SaveFilePickerWindow = Window & {
   }>;
 };
 
-export function ExportDatasetPanel({ projectId, imageIds }: { projectId: number; imageIds: number[] }) {
+export function ExportDatasetPanel({ projectId, imageIds }: { projectId: number; imageIds: number[]; }) {
   const [filename, setFilename] = useState(`qwen-messages-${formatChinaFilenameTimestamp()}.json`);
+  const [imagePathPrefix, setImagePathPrefix] = useState("");
+  const [trimmedParentLevels, setTrimmedParentLevels] = useState(0);
   const [isExporting, setIsExporting] = useState(false);
 
   const query = useQuery({
@@ -34,6 +36,19 @@ export function ExportDatasetPanel({ projectId, imageIds }: { projectId: number;
 
   const rows = useMemo(() => {
     return (query.data ?? []).flatMap((image: ImageDetail) => {
+      const getImagePath = () => {
+        const normalizedSourcePath = image.source_path.replace(/\\/g, "/");
+        const sourceParts = normalizedSourcePath.split("/").filter(Boolean);
+        const trimmedParts = sourceParts.slice(trimmedParentLevels);
+        const normalizedRelativePath = trimmedParts.join("/");
+        const fallbackPath = sourceParts.at(-1) ?? image.relative_path.replace(/\\/g, "/");
+        if (!imagePathPrefix) return normalizedRelativePath || fallbackPath;
+
+        const prefix = imagePathPrefix.replace(/\\/g, "/").replace(/\/$/, "");
+        return normalizedRelativePath ? `${prefix}/${normalizedRelativePath}` : `${prefix}/${fallbackPath}`;
+      };
+
+      const imagePath = getImagePath();
       const questions = image.questions.filter((record) => record.status === "success");
       const descriptions = image.descriptions.filter((record) => record.status === "success");
       const questionMap = new Map(questions.map((question) => [question.id, question]));
@@ -44,25 +59,25 @@ export function ExportDatasetPanel({ projectId, imageIds }: { projectId: number;
           if (!matchedQuestion) return [];
           return [{
             messages: [
-              { role: "user", content: `<image>${matchedQuestion.content}` },
+              { role: "user", content: `${matchedQuestion.content}<image>` },
               { role: "assistant", content: description.content },
             ],
-            images: [image.source_path],
+            images: [imagePath],
           }];
         });
       const unpairedDescriptions = descriptions.filter((description) => !description.paired_question_id);
       const crossRows = questions.flatMap((question) =>
         unpairedDescriptions.map((description) => ({
           messages: [
-            { role: "user", content: `<image>${question.content}` },
+            { role: "user", content: `${question.content}<image>` },
             { role: "assistant", content: description.content },
           ],
-          images: [image.source_path],
+          images: [imagePath],
         })),
       );
       return [...pairedRows, ...crossRows];
     });
-  }, [query.data]);
+  }, [imagePathPrefix, query.data, trimmedParentLevels]);
 
   const exportableImageCount = useMemo(
     () =>
@@ -126,6 +141,32 @@ export function ExportDatasetPanel({ projectId, imageIds }: { projectId: number;
             <Label>导出文件名</Label>
             <Input value={filename} onChange={(event) => setFilename(event.target.value)} />
           </div>
+          <div className="space-y-2">
+            <Label>图片路径前缀 (适用于迁移到其他目录)</Label>
+            <Input
+              placeholder="如：/user/home/data/"
+              value={imagePathPrefix}
+              onChange={(event) => setImagePathPrefix(event.target.value)}
+            />
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label>去除左侧父目录级别</Label>
+            <Input
+              type="number"
+              min={0}
+              step={1}
+              value={trimmedParentLevels}
+              onChange={(event) => {
+                const nextValue = Number.parseInt(event.target.value, 10);
+                setTrimmedParentLevels(Number.isNaN(nextValue) ? 0 : Math.max(0, nextValue));
+              }}
+            />
+            <p className="text-sm text-muted-foreground">
+              会先把 Windows 路径统一成 `/`。例如 `D:/user/hry/vlm-dataset/a.jpg` 填 `1` 后会变成 `user/hry/vlm-dataset/a.jpg`。
+            </p>
+          </div>
         </div>
         <div className="grid gap-4 rounded-2xl border border-border/50 bg-secondary/20 p-4 md:grid-cols-3">
           <div>
@@ -142,9 +183,9 @@ export function ExportDatasetPanel({ projectId, imageIds }: { projectId: number;
           </div>
         </div>
         <div className="rounded-2xl border border-dashed border-border/50 bg-white/65 p-4 text-sm text-muted-foreground">
-          每条样本会导出为 `messages` 和 `images` 两个字段，用户消息格式为 `&lt;image&gt;问题内容`。普通描述会和同图下全部成功问题做组合；若描述是基于某条问题配对生成的，则只会导出对应的那组 QA，不再和其他问题交叉匹配。
+          每条样本会导出为 `messages` 和 `images` 两个字段，用户消息格式为 `问题内容&lt;image&gt;`。普通描述会和同图下全部成功问题做组合；若描述是基于某条问题配对生成的，则只会导出对应的那组 QA，不再和其他问题交叉匹配。
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-end pb-6">
           <Button disabled={isExporting || query.isLoading || rows.length === 0} onClick={handleExport}>
             {isExporting ? "导出中..." : "导出 Qwen JSON"}
           </Button>

@@ -36,6 +36,7 @@ python -m uvicorn backend.app.main:app --reload
 - 图片描述批量生成与追加生成
 - 基于描述或提示词的问题批量生成与追加生成
 - ShareGPT 单轮格式导出
+- 导出时可为图片路径追加自定义前缀，并按需保留原始图片的父目录层级
 
 ## Notes
 

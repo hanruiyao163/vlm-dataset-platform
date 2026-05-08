@@ -169,6 +169,7 @@ class GenerateDescriptionsRequest(BaseModel):
     count_per_image: int = Field(default=1, ge=1, le=10)
     concurrency: int = Field(default=3, ge=1, le=20)
     use_structured_output: bool = False
+    task_id: str | None = None
 
 
 class GenerateQuestionsRequest(BaseModel):
@@ -180,6 +181,7 @@ class GenerateQuestionsRequest(BaseModel):
     count_per_image: int = Field(default=1, ge=1, le=10)
     concurrency: int = Field(default=3, ge=1, le=20)
     use_structured_output: bool = False
+    task_id: str | None = None
 
 
 class ImageGenerationResult(BaseModel):
@@ -203,13 +205,14 @@ class ExportItem(BaseModel):
     answer_id: int
 
 
-class ExportShareGPTRequest(BaseModel):
+class ExportJsonRequest(BaseModel):
     project_id: int
-    image_field: str = "image"
+    image_path_prefix: str = ""
+    trimmed_parent_levels: int = Field(default=0, ge=0, le=20)
     items: list[ExportItem]
 
 
-class ExportShareGPTResponse(BaseModel):
+class ExportJsonResponse(BaseModel):
     filename: str
     path: str
     item_count: int

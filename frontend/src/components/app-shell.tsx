@@ -13,7 +13,7 @@ export function AppShell() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   return (
-    <div className="min-h-screen text-foreground">
+    <div className="relative z-10 min-h-screen text-foreground">
       <div className="mx-auto flex min-h-screen max-w-[1760px] gap-5 px-3 py-4 lg:px-4">
         <aside className="sticky top-4 hidden w-72 shrink-0 self-start overflow-hidden rounded-[32px] border border-border/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.97),rgba(240,242,248,0.94))] p-5 text-foreground shadow-soft lg:block">
           <div className="absolute inset-x-6 top-0 h-24 rounded-b-[32px] bg-[radial-gradient(circle_at_top,rgba(99,91,190,0.08),transparent_70%)]" />

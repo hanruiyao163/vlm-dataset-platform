@@ -81,6 +81,11 @@ export function ProjectOverviewPage({ projectId }: { projectId: number; }) {
         actions={
           <>
             <Button variant="outline" asChild>
+              <Link to="/projects/$projectId/export" params={{ projectId: String(projectId) }}>
+                导出全部数据
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
               <Link
                 to="/projects/$projectId/images"
                 params={{ projectId: String(projectId) }}
@@ -101,7 +106,7 @@ export function ProjectOverviewPage({ projectId }: { projectId: number; }) {
             ["描述总数", projectQuery.data.description_count],
             ["问题总数", projectQuery.data.question_count],
           ].map(([label, value]) => (
-            <Card key={String(label)}>
+            <Card key={String(label)} className="transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:-translate-y-1.5 hover:shadow-[0_20px_60px_rgba(99,91,190,0.15),0_8px_16px_rgba(99,91,190,0.08)] hover:border-white">
               <CardContent className="p-6">
                 <p className="text-sm text-muted-foreground">{label}</p>
                 <p className="mt-2 text-3xl font-semibold">{value}</p>
@@ -115,7 +120,7 @@ export function ProjectOverviewPage({ projectId }: { projectId: number; }) {
           <CardTitle>登记批次</CardTitle>
           <CardDescription>你可以持续往同一个项目追加多个批次，每个批次只记录来源文件夹和图片信息，不会复制原始图片。</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 pb-8">
           {(batchesQuery.data ?? []).map((batch) => (
             <div
               key={batch.id}
@@ -172,11 +177,11 @@ export function ProjectOverviewPage({ projectId }: { projectId: number; }) {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>默认描述提示词</Label>
-            <Textarea value={descriptionPrompt} onChange={(event) => setDescriptionPrompt(event.target.value)} />
+            <Textarea className="min-h-[180px]" value={descriptionPrompt} onChange={(event) => setDescriptionPrompt(event.target.value)} />
           </div>
           <div className="space-y-2">
             <Label>默认问题提示词</Label>
-            <Textarea value={questionPrompt} onChange={(event) => setQuestionPrompt(event.target.value)} />
+            <Textarea className="min-h-[180px]" value={questionPrompt} onChange={(event) => setQuestionPrompt(event.target.value)} />
           </div>
           <div className="flex justify-end">
             <Button
@@ -218,11 +223,11 @@ export function ProjectOverviewPage({ projectId }: { projectId: number; }) {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>默认描述提示词</Label>
-              <Textarea value={batchDescriptionPrompt} onChange={(event) => setBatchDescriptionPrompt(event.target.value)} />
+              <Textarea className="min-h-[180px]" value={batchDescriptionPrompt} onChange={(event) => setBatchDescriptionPrompt(event.target.value)} />
             </div>
             <div className="space-y-2">
               <Label>默认问题提示词</Label>
-              <Textarea value={batchQuestionPrompt} onChange={(event) => setBatchQuestionPrompt(event.target.value)} />
+              <Textarea className="min-h-[180px]" value={batchQuestionPrompt} onChange={(event) => setBatchQuestionPrompt(event.target.value)} />
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setEditingBatchId(null)}>

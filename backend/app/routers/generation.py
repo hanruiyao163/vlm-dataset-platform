@@ -31,6 +31,19 @@ from ..services.files import resolve_image_path
 
 router = APIRouter(tags=["generation"])
 
+GENERATION_PROGRESS: dict[str, dict[str, int]] = {}
+
+@router.get("/progress")
+async def get_progress(task_id: str):
+    return GENERATION_PROGRESS.get(task_id, {"current": 0, "total": 0})
+
+async def _wrap_progress(coro, task_id: str | None):
+    try:
+        return await coro
+    finally:
+        if task_id and task_id in GENERATION_PROGRESS:
+            GENERATION_PROGRESS[task_id]["current"] += 1
+
 
 def _record_to_schema(record: DescriptionGeneration | QuestionGeneration) -> GenerationRecord:
     description_id = getattr(record, "description_id", None)
@@ -143,6 +156,12 @@ async def generate_descriptions(payload: GenerateDescriptionsRequest, db: Sessio
             run_one(image_id, question_id, prompt, file_path, question)
             for image_id, file_path, prompt, question, question_id in planned
         ]
+    if payload.task_id:
+        GENERATION_PROGRESS[payload.task_id] = {
+            "current": 0,
+            "total": len(coroutines)
+        }
+        coroutines = [_wrap_progress(coro, payload.task_id) for coro in coroutines]
     outcomes = await run_limited(coroutines, payload.concurrency)
 
     created_by_image: dict[int, list[DescriptionGeneration]] = {image.id: [] for image in images}
@@ -365,6 +384,12 @@ async def generate_questions(payload: GenerateQuestionsRequest, db: Session = De
             run_one(image_id, prompt, file_path, description)
             for image_id, file_path, description, _description_id, prompt in planned
         ]
+    if payload.task_id:
+        GENERATION_PROGRESS[payload.task_id] = {
+            "current": 0,
+            "total": len(coroutines)
+        }
+        coroutines = [_wrap_progress(coro, payload.task_id) for coro in coroutines]
     outcomes = await run_limited(coroutines, payload.concurrency)
 
     created_by_image: dict[int, list[QuestionGeneration]] = {image.id: [] for image in images}

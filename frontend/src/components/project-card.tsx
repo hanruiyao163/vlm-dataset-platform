@@ -29,7 +29,7 @@ export function ProjectCard({ project }: { project: Project; }) {
 
   return (
     <Card className="group overflow-hidden border-border/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(240,242,248,0.94))] transition-shadow duration-200 hover:shadow-float">
-      <CardHeader className="border-b border-border/50 bg-[radial-gradient(circle_at_top_right,rgba(99,91,190,0.05),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.92),rgba(242,244,250,0.94))]">
+      <CardHeader className="gap-3 border-b border-border/50 px-5 py-5 bg-[radial-gradient(circle_at_top_right,rgba(99,91,190,0.05),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.92),rgba(242,244,250,0.94))]">
         <div className="flex items-center justify-between">
           <Badge>{project.batch_count} 批次</Badge>
           <span className="text-xs font-medium text-muted-foreground">{formatChinaDateTime(project.created_at)}</span>
@@ -39,36 +39,36 @@ export function ProjectCard({ project }: { project: Project; }) {
           Dataset Pipeline
         </div>
         <CardTitle className="text-xl">{project.name}</CardTitle>
-        <CardDescription className="line-clamp-2 min-h-10 leading-6">
+        <CardDescription className="line-clamp-2 min-h-9 leading-5.5">
           {project.note || "这个项目还没有备注。"}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-5 pt-6 pb-1">
-        <div className="grid grid-cols-3 gap-3 text-sm">
-          <div className="rounded-[22px] border border-border/40 bg-white/85 p-3.5 transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-soft">
-            <Folder className="mb-3 h-4 w-4 text-primary" />
+      <CardContent className="space-y-4 px-3 py-3">
+        <div className="grid grid-cols-3 gap-2.5 text-sm">
+          <div className="rounded-[20px] border border-border/40 bg-white/85 p-3 transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-soft">
+            <Folder className="mb-2 h-4 w-4 text-primary" />
             <div className="text-xl font-semibold tracking-tight">{project.image_count}</div>
             <div className="text-muted-foreground">图片</div>
           </div>
-          <div className="rounded-[22px] border border-border/40 bg-white/85 p-3.5 transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-soft">
-            <ScanSearch className="mb-3 h-4 w-4 text-primary" />
+          <div className="rounded-[20px] border border-border/40 bg-white/85 p-3 transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-soft">
+            <ScanSearch className="mb-2 h-4 w-4 text-primary" />
             <div className="text-xl font-semibold tracking-tight">{project.description_count}</div>
             <div className="text-muted-foreground">描述</div>
           </div>
-          <div className="rounded-[22px] border border-border/40 bg-white/85 p-3.5 transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-soft">
-            <MessageSquareMore className="mb-3 h-4 w-4 text-primary" />
+          <div className="rounded-[20px] border border-border/40 bg-white/85 p-3 transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-soft">
+            <MessageSquareMore className="mb-2 h-4 w-4 text-primary" />
             <div className="text-xl font-semibold tracking-tight">{project.question_count}</div>
             <div className="text-muted-foreground">问题</div>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button asChild className="flex-1">
+        <div className="grid grid-cols-2 gap-3">
+          <Button asChild className="h-9">
             <Link to="/projects/$projectId" params={{ projectId: String(project.id) }}>
               打开项目
               <ArrowUpRight className="h-4 w-4" />
             </Link>
           </Button>
-          <Button variant="outline" className="flex-1" asChild>
+          <Button variant="outline" className="h-9" asChild>
             <Link
               to="/projects/$projectId/images"
               params={{ projectId: String(project.id) }}
@@ -77,8 +77,13 @@ export function ProjectCard({ project }: { project: Project; }) {
               图片工作台
             </Link>
           </Button>
+          <Button variant="outline" className="h-9 col-span-2" asChild>
+            <Link to="/projects/$projectId/export" params={{ projectId: String(project.id) }}>
+              导出全部数据
+            </Link>
+          </Button>
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-end pt-1">
           <Button variant="ghost" size="sm" className="text-muted-foreground/60 hover:bg-destructive/10 hover:text-destructive" onClick={() => setConfirmOpen(true)}>
             删除项目
           </Button>
