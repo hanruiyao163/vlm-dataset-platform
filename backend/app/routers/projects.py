@@ -10,6 +10,27 @@ from ..schemas import BatchSummary, ImageDeleteRequest, MessageResponse, Project
 router = APIRouter(prefix="/projects", tags=["projects"])
 
 
+def _batch_record_counts(db: Session, batch_id: int) -> tuple[int, int, int]:
+    image_count = db.scalar(select(func.count(Image.id)).where(Image.batch_id == batch_id)) or 0
+    description_count = (
+        db.scalar(
+            select(func.count(DescriptionGeneration.id))
+            .join(Image, DescriptionGeneration.image_id == Image.id)
+            .where(Image.batch_id == batch_id)
+        )
+        or 0
+    )
+    question_count = (
+        db.scalar(
+            select(func.count(QuestionGeneration.id))
+            .join(Image, QuestionGeneration.image_id == Image.id)
+            .where(Image.batch_id == batch_id)
+        )
+        or 0
+    )
+    return image_count, description_count, question_count
+
+
 def _project_summary(db: Session, project: Project) -> ProjectSummary:
     batch_count = db.scalar(select(func.count(Batch.id)).where(Batch.project_id == project.id)) or 0
     image_count = db.scalar(select(func.count(Image.id)).where(Image.project_id == project.id)) or 0
@@ -103,7 +124,7 @@ def list_project_batches(project_id: int, db: Session = Depends(get_db)):
     ).all()
     items = []
     for batch in batches:
-        image_count = db.scalar(select(func.count(Image.id)).where(Image.batch_id == batch.id)) or 0
+        image_count, description_count, question_count = _batch_record_counts(db, batch.id)
         items.append(
             BatchSummary(
                 id=batch.id,
@@ -114,6 +135,8 @@ def list_project_batches(project_id: int, db: Session = Depends(get_db)):
                 default_question_prompt=batch.default_question_prompt,
                 created_at=batch.created_at,
                 image_count=image_count,
+                description_count=description_count,
+                question_count=question_count,
             )
         )
     return items

@@ -263,7 +263,11 @@ export function ProjectImagesPage({
                 <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">全部批次 ({projectQuery.data?.image_count ?? 0})</SelectItem>
-                  {(batchesQuery.data ?? []).map((batch) => <SelectItem key={batch.id} value={String(batch.id)}>{batch.name} ({batch.image_count})</SelectItem>)}
+                  {(batchesQuery.data ?? []).map((batch) => (
+                    <SelectItem key={batch.id} value={String(batch.id)}>
+                      {batch.name} ({batch.image_count} 图)
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

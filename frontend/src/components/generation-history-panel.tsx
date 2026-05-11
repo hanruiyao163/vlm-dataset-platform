@@ -68,6 +68,7 @@ function RecordSection({
   const [createQuestionId, setCreateQuestionId] = useState<string>("");
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editingContainerRef = useRef<HTMLDivElement | null>(null);
+  const createTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const confirmDeleteRef = useRef<HTMLButtonElement | null>(null);
   const queryClient = useQueryClient();
 
@@ -89,7 +90,7 @@ function RecordSection({
       setDraft("");
       return;
     }
-    setActiveIndex((current) => Math.min(current, records.length - 1));
+    setActiveIndex(records.length - 1);
     setIsCollapsed(false);
   }, [records]);
 
@@ -208,6 +209,11 @@ function RecordSection({
     };
   }, [createDescriptionMode, createQuestionId, draft, editingId, isCreating, records]);
 
+  useEffect(() => {
+    if (!isCreating) return;
+    createTextareaRef.current?.focus();
+  }, [isCreating]);
+
   return (
     <section className="flex min-h-0 flex-col rounded-[28px] border border-border/50 bg-white/70 p-4">
       <div className="mb-4 flex items-center justify-between">
@@ -286,6 +292,7 @@ function RecordSection({
             </div>
           ) : null}
           <Textarea
+            ref={createTextareaRef}
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             placeholder={

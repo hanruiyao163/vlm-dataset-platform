@@ -86,6 +86,8 @@ export function ImagePreviewDrawer({
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
       if (event.key === "ArrowLeft") {
         event.preventDefault();
         navigateImage("prev");

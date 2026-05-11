@@ -123,12 +123,12 @@ def get_image(image_id: int, db: Session = Depends(get_db)):
     descriptions = db.scalars(
         select(DescriptionGeneration)
         .where(DescriptionGeneration.image_id == image.id)
-        .order_by(DescriptionGeneration.created_at.desc(), DescriptionGeneration.id.desc())
+        .order_by(DescriptionGeneration.created_at.asc(), DescriptionGeneration.id.asc())
     ).all()
     questions = db.scalars(
         select(QuestionGeneration)
         .where(QuestionGeneration.image_id == image.id)
-        .order_by(QuestionGeneration.created_at.desc(), QuestionGeneration.id.desc())
+        .order_by(QuestionGeneration.created_at.asc(), QuestionGeneration.id.asc())
     ).all()
     return ImageDetail(
         **summary.model_dump(),

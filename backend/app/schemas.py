@@ -67,6 +67,8 @@ class BatchSummary(BaseModel):
     default_question_prompt: str
     created_at: datetime
     image_count: int
+    description_count: int
+    question_count: int
 
 
 class BatchUpdate(BaseModel):

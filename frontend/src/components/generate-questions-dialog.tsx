@@ -70,8 +70,13 @@ export function GenerateQuestionsDialog({
   const defaultDescriptionIdMap = useMemo(() => {
     const mapping: Record<number, number> = {};
     (imageDetailQueries.data ?? []).forEach((item: ImageDetail) => {
-      const latest = item.descriptions.find((record) => record.status === "success");
-      if (latest) mapping[item.id] = latest.id;
+      for (let index = item.descriptions.length - 1; index >= 0; index -= 1) {
+        const record = item.descriptions[index];
+        if (record.status === "success") {
+          mapping[item.id] = record.id;
+          break;
+        }
+      }
     });
     return mapping;
   }, [imageDetailQueries.data]);

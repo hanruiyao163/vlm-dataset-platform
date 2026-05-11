@@ -139,7 +139,9 @@ export function ProjectOverviewPage({ projectId }: { projectId: number; }) {
                   <p className="truncate text-sm text-muted-foreground">{batch.source_folder || "未记录源文件夹"}</p>
                 </div>
                 <div className="shrink-0 text-right text-sm text-muted-foreground">
-                  <p className="font-medium tabular-nums">{batch.image_count} 张图片</p>
+                  <p className="font-medium tabular-nums">
+                    {batch.image_count} 图 / {batch.description_count} 描述 / {batch.question_count} 问题
+                  </p>
                   <p>{formatChinaDateTime(batch.created_at)}</p>
                 </div>
               </Link>

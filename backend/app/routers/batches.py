@@ -11,11 +11,32 @@ from sqlalchemy.orm import Session
 
 from ..config import IMAGE_EXTENSIONS, UPLOAD_DIR
 from ..db import get_db
-from ..models import Batch, Image, Project
+from ..models import Batch, DescriptionGeneration, Image, Project, QuestionGeneration
 from ..schemas import BatchScanRequest, BatchSummary, BatchUpdate, DirectoryPickResponse, MessageResponse
 from ..services.files import get_image_dimensions, sha256_file
 
 router = APIRouter(prefix="/projects/{project_id}/batches", tags=["batches"])
+
+
+def _batch_record_counts(db: Session, batch_id: int) -> tuple[int, int, int]:
+    image_count = db.scalar(select(func.count(Image.id)).where(Image.batch_id == batch_id)) or 0
+    description_count = (
+        db.scalar(
+            select(func.count(DescriptionGeneration.id))
+            .join(Image, DescriptionGeneration.image_id == Image.id)
+            .where(Image.batch_id == batch_id)
+        )
+        or 0
+    )
+    question_count = (
+        db.scalar(
+            select(func.count(QuestionGeneration.id))
+            .join(Image, QuestionGeneration.image_id == Image.id)
+            .where(Image.batch_id == batch_id)
+        )
+        or 0
+    )
+    return image_count, description_count, question_count
 
 
 @router.get("/pick-directory", response_model=DirectoryPickResponse)
@@ -92,6 +113,8 @@ def scan_batch(project_id: int, payload: BatchScanRequest, db: Session = Depends
         default_question_prompt=batch.default_question_prompt,
         created_at=batch.created_at,
         image_count=image_count,
+        description_count=0,
+        question_count=0,
     )
 
 
@@ -128,7 +151,7 @@ def update_batch(project_id: int, batch_id: int, payload: BatchUpdate, db: Sessi
     db.add(batch)
     db.commit()
     db.refresh(batch)
-    image_count = db.scalar(select(func.count(Image.id)).where(Image.batch_id == batch.id)) or 0
+    image_count, description_count, question_count = _batch_record_counts(db, batch.id)
     return BatchSummary(
         id=batch.id,
         project_id=batch.project_id,
@@ -138,4 +161,6 @@ def update_batch(project_id: int, batch_id: int, payload: BatchUpdate, db: Sessi
         default_question_prompt=batch.default_question_prompt,
         created_at=batch.created_at,
         image_count=image_count,
+        description_count=description_count,
+        question_count=question_count,
     )

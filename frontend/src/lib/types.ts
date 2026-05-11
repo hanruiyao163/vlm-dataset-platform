@@ -44,6 +44,8 @@ export type Batch = {
   default_question_prompt: string;
   created_at: string;
   image_count: number;
+  description_count: number;
+  question_count: number;
 };
 
 export type GenerationRecord = {
